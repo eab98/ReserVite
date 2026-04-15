@@ -6,7 +6,7 @@
 !/.idea/libraries
 
 /.idea/libraries/*
-/.idea/libraries/Dart_SDK.xml
+Dart_SDK.xml
 !/.idea/libraries/Flutter_Plugins.xml
 
 /data
