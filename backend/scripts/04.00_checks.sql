@@ -58,9 +58,12 @@ alter table restaurants drop constraint if exists slot_check;
 alter table restaurants add constraint slot_check
     check ( restaurants.slot_duration in (10, 15, 20, 30, 60) ) not valid;
 
-/**************************************************************
-  Table tables
- **************************************************************/
+/*
+ ==========================================
+ TABLE TABLES
+ ==========================================
+ */
+
 alter table tables
     drop constraint if exists nb_table_unique;
 
@@ -81,4 +84,18 @@ alter table tables
     add constraint capacity_check
     check(tables.capacity>0) not valid;
 
+/*
+ ==========================================
+ TABLE SERVICES
+ ==========================================
+ */
 
+alter table services drop constraint if exists day_of_week_check;
+
+alter table services add constraint day_of_week_check
+check ( services.day_of_week >=1 && services.day_of_week <= 7 ) not valid;
+
+alter table services drop constraint if exists end_time_check;
+
+alter table services add constraint end_time_check
+check ( services.end_time - services.start_time >= 1 ) not valid;
