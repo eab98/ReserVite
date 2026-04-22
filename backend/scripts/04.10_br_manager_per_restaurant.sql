@@ -11,6 +11,7 @@ set search_path to public;
             raise exception 'Restaurant needs at least one manager';
 
         end if;
+        return old;
      end;
      $$language plpgsql;
 

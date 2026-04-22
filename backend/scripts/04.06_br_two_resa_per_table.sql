@@ -42,6 +42,7 @@ set search_path to public;
              ) then
              raise exception 'Two reservations cannot exist for the same table on the same date for the same service';
          end if;
+        return new;
      end;
      $$language plpgsql;
 

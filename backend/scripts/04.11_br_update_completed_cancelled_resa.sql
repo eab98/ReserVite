@@ -10,7 +10,9 @@ set search_path to public;
          if(new is distinct from old and (old.status == 'cancelled' || old.status == 'confirmed')) then
              raise exception 'Cannot modify a cancelled or confirmed reservation';
          end if;
+        return new;
      end;
+
 
      $$language plpgsql;
 
