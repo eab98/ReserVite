@@ -96,9 +96,6 @@ alter table services add constraint day_of_week_check
 check ( services.day_of_week >= 1 && services.day_of_week <= 7 ) not valid;
 
 
-/*
-    ATTENTION : CONTRAINTE A REFAIRE
-*/
 alter table services drop constraint if exists end_time_check;
 
 alter table services add constraint end_time_check
