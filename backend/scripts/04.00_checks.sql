@@ -96,10 +96,42 @@ alter table services add constraint day_of_week_check
 check ( services.day_of_week >= 1 && services.day_of_week <= 7 ) not valid;
 
 
-/*
-    ATTENTION : CONTRAINTE A REFAIRE
-*/
 alter table services drop constraint if exists end_time_check;
 
 alter table services add constraint end_time_check
 check ( services.end_time - services.start_time >= 1 ) not valid;
+
+/*
+ ==========================================
+ TABLE RESERVATIONS
+ ==========================================
+ */
+
+ /*
+  nombre de convives d'un resa doit être >0
+  */
+ ALTER TABLE reservations DROP CONSTRAINT IF EXISTS capacity_check;
+
+ alter table reservations add constraint capacity_check
+ check ( number_of_guests > 0) not valid;
+
+/*
+ s'il y a une special request, sa longueur doit être >10
+ */
+ALTER TABLE reservations DROP CONSTRAINT IF EXISTS special_request_check;
+
+ALTER TABLE reservations add constraint special_request_check
+check(
+    special_requests IS NOT NULL && length(trim(special_requests))<=10
+    ) not valid;
+
+
+/*
+ Statut resa doit appartenir au enum
+ */
+
+ALTER TABLE reservations DROP CONSTRAINT IF EXISTS status_check;
+
+
+alter table reservations add constraint status_check
+ check( status in ('pending', 'confirmed', 'cancelled', 'completed')) not valid;
