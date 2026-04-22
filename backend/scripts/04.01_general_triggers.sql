@@ -61,3 +61,29 @@ create or replace trigger check_restaurant_update
     before update on services
     for each row
 execute procedure restaurant_update();
+
+/*
+ ==========================================
+ TABLE RESERVATIONS
+ ==========================================
+ */
+
+ /*
+  On ne peut pas modifier le resto ou client d'une resa
+  */
+
+create or replace function resa_update() returns trigger as
+       $$
+       begin
+           if((LOWER(trim(new.restaurant)) is distinct from LOWER(trim(old.restaurant)))
+                  || LOWER(trim(new.client)) is distinct from LOWER(trim(old.client)))then
+               raise exception 'Cannot modify the restaurant or the cleint of an ongoing reservation';
+           end if;
+           return new;
+       end;
+       $$language plpgsql;
+
+create or replace trigger check_resa_update
+    before update on reservations
+    for each row
+    execute procedure resa_update();
