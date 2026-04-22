@@ -9,7 +9,7 @@ set search_path to public;
  alter table users drop constraint if exists name_length;
 
 alter table users add constraint name_length
-check ( length(trim(users.full_name) >= 3 ) NOT VALID;
+check ( length(trim(users.full_name)) >= 3 ) NOT VALID;
 
 /*
  ==========================================
@@ -41,17 +41,17 @@ alter table restaurants add constraint check_phone_number_format
 alter table restaurants drop constraint if exists description_length;
 
 alter table restaurants add constraint description_length
-    check ( restaurants.description is null || length(trim(restaurants.description) >= 10) ) not valid;
+    check ( restaurants.description is null or length(trim(restaurants.description)) >= 10)  not valid;
 
 alter table restaurants drop constraint if exists rating_check;
 
 alter table restaurants add constraint rating_check
-    check ( restaurants.rating is null || (restaurants.rating >= 0.0 && restaurants.rating <= 5.0)) not valid;
+    check ( restaurants.rating is null or (restaurants.rating >= 0.0 and restaurants.rating <= 5.0)) not valid;
 
 alter table restaurants drop constraint if exists price_range_check;
 
 alter table restaurants add constraint price_range_check
-    check ( restaurants.price_range is null || (restaurants.price_range >= 1 && restaurants.price_range <= 4) ) not valid;
+    check ( restaurants.price_range is null or (restaurants.price_range >= 1 and restaurants.price_range <= 4) ) not valid;
 
 alter table restaurants drop constraint if exists slot_check;
 
@@ -64,11 +64,11 @@ alter table restaurants add constraint slot_check
  ==========================================
  */
 
-alter table tables
+/*alter table tables
     drop constraint if exists nb_table_unique;
 
 alter table tables
-    add constraint nb_table_unique unique (table_number) not valid ;
+    add constraint nb_table_unique unique (table_number) ;*/
 
 alter table tables
     drop constraint if exists nb_table_value;
@@ -93,13 +93,13 @@ alter table tables
 alter table services drop constraint if exists day_of_week_check;
 
 alter table services add constraint day_of_week_check
-check ( services.day_of_week >= 1 && services.day_of_week <= 7 ) not valid;
+check ( services.day_of_week >= 1 and services.day_of_week <= 7 ) not valid;
 
 
 alter table services drop constraint if exists end_time_check;
 
 alter table services add constraint end_time_check
-check ( services.end_time - services.start_time >= 1 ) not valid;
+check ( services.end_time - services.start_time >= interval '1 hour' ) not valid;
 
 /*
  ==========================================
@@ -122,7 +122,7 @@ ALTER TABLE reservations DROP CONSTRAINT IF EXISTS special_request_check;
 
 ALTER TABLE reservations add constraint special_request_check
 check(
-    special_requests IS NOT NULL && length(trim(special_requests))<=10
+    special_requests IS NOT NULL and (length(trim(special_requests)) <= 10)
     ) not valid;
 
 
