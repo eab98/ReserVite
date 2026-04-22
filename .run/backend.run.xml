@@ -3,6 +3,15 @@
     <script-file value="$PROJECT_DIR$/backend/scripts/01_init.sql" />
     <script-file value="$PROJECT_DIR$/backend/scripts/02_security.sql" />
     <script-file value="$PROJECT_DIR$/backend/scripts/03_tables_and_data.sql" />
+    <script-file value="$PROJECT_DIR$/backend/scripts/04.00_checks.sql" />
+    <script-file value="$PROJECT_DIR$/backend/scripts/04.01_general_triggers.sql" />
+    <script-file value="$PROJECT_DIR$/backend/scripts/04.01_br_res_client.sql" />
+    <script-file value="$PROJECT_DIR$/backend/scripts/04.03_br_res_belongs_to_rest.sql" />
+    <script-file value="$PROJECT_DIR$/backend/scripts/04.06_br_two_resa_per_table.sql" />
+    <script-file value="$PROJECT_DIR$/backend/scripts/04.09_br_status_rules.sql" />
+    <script-file value="$PROJECT_DIR$/backend/scripts/04.10_br_manager_per_restaurant.sql" />
+    <script-file value="$PROJECT_DIR$/backend/scripts/04.11_br_update_completed_cancelled_resa.sql" />
+    <script-file value="$PROJECT_DIR$/backend/scripts/04.12_br_no_table_for_pending_or_cancelled.sql" />
     <script-mode>FILE</script-mode>
     <data-source id="6d275bb5-c69c-4f95-bc29-f6a29631655b" namespace="database/&quot;prbd-2526-a03&quot;" />
     <method v="2" />

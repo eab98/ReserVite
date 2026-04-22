@@ -22,6 +22,7 @@ set search_path to public;
          end if;
          end if;
          end if;
+         return new;
 
      end;
      $$language plpgsql;
