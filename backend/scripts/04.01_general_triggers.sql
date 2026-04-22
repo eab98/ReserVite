@@ -12,6 +12,7 @@ $$
          if new.role != users.role then
              raise exception 'Cannot change user role';
          end if;
+         return new;
      end;
 $$ language plpgsql;
 
