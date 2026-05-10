@@ -9,7 +9,7 @@ set search_path to public;
 create or replace function check_user_role() returns trigger as
 $$
      begin
-         if new.role != users.role then
+         if new.role != old.role then
              raise exception 'Cannot change user role';
          end if;
          return new;
