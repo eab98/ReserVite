@@ -122,7 +122,7 @@ ALTER TABLE reservations DROP CONSTRAINT IF EXISTS special_request_check;
 
 ALTER TABLE reservations add constraint special_request_check
 check(
-    special_requests IS NOT NULL and (length(trim(special_requests)) <= 10)
+    special_requests IS NULL or (length(trim(special_requests)) >= 10)
     ) not valid;
 
 
