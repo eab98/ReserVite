@@ -6,6 +6,7 @@
     <script-file value="$PROJECT_DIR$/backend/scripts/04.00_checks.sql" />
     <script-file value="$PROJECT_DIR$/backend/scripts/04.01_general_triggers.sql" />
     <script-file value="$PROJECT_DIR$/backend/scripts/04.01_br_res_client.sql" />
+    <script-file value="$PROJECT_DIR$/backend/scripts/04.02_br_enough_seats_for_res.sql" />
     <script-file value="$PROJECT_DIR$/backend/scripts/04.03_br_res_belongs_to_rest.sql" />
     <script-file value="$PROJECT_DIR$/backend/scripts/04.06_br_two_resa_per_table.sql" />
     <script-file value="$PROJECT_DIR$/backend/scripts/04.09_br_status_rules.sql" />
