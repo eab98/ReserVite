@@ -9,7 +9,7 @@ set search_path to public;
 create or replace function check_user_role() returns trigger as
 $$
      begin
-         if new.role != users.role then
+         if new.role != old.role then
              raise exception 'Cannot change user role';
          end if;
          return new;
@@ -51,9 +51,10 @@ create trigger forbid_update_restaurant_table
  create or replace function restaurant_update() returns trigger as
 $$
      begin
-         if new.restaurant != services.restaurant then
+         if new.restaurant is distinct from services.restaurant then
              raise exception 'Cannot modify the restaurant for a service';
          end if;
+         return new;
      end;
 $$ language plpgsql;
 
@@ -76,7 +77,7 @@ create or replace function resa_update() returns trigger as
        $$
        begin
            if((LOWER(trim(new.restaurant)) is distinct from LOWER(trim(old.restaurant)))
-                  || LOWER(trim(new.client)) is distinct from LOWER(trim(old.client)))then
+                  or LOWER(trim(new.client)) is distinct from LOWER(trim(old.client)))then
                raise exception 'Cannot modify the restaurant or the cleint of an ongoing reservation';
            end if;
            return new;

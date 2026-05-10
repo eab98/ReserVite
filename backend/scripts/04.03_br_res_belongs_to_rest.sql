@@ -13,7 +13,7 @@ create or replace function check_same_restaurant() returns trigger as
 $$
     begin
         if (select reservations.restaurant from reservations where reservations.id = new.reservation) !=
-           (select tables.restaurant from tables where tables.id = new.table) then
+           (select tables.restaurant from tables where tables.id = new."table") then
             raise exception 'Table must be in the same restaurant as reservation';
         end if;
         return new;
