@@ -17,7 +17,7 @@ set search_path to public;
          else if(tg_op = 'UPDATE' and ((old.status = 'pending' and new.status not in ('confirmed', 'cancelled'))
                      or (old.status = 'confirmed' and new.status not in ('completed', 'cancelled')))) then
              raise exception 'Status of the reservation cannot go backwards';
-         else if(old.status in ('completed', 'cancelled')) then
+         else if(tg_op = 'UPDATE' and  old.status in ('completed', 'cancelled')) then
              raise exception 'Cannot modify a completed or cancelled reservation';
          end if;
          end if;
