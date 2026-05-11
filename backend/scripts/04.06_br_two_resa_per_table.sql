@@ -23,7 +23,7 @@ set search_path to public;
  create or replace function resa_per_table() returns trigger as
      $$
      begin
-         if (new.status in ('completed', 'confirmed') and (new is distinct from old) and
+         if (new.status in ('completed', 'confirmed') and
              exists (select *
               from reservations r1,
                    reservations r2,
@@ -32,12 +32,13 @@ set search_path to public;
                    restaurants resto,
                    services s
               where r1.id = rt1.reservation and r2.id = rt2.reservation and rt1."table" = rt2."table" and r1.datetime =r2.datetime and
-                    rt1.reservation != rt2.reservation and r1.restaurant = resto.id and r2.restaurant = resto.id and
-                    resto.id = s.restaurant and extract(isodow from r1.datetime::time)=s.day_of_week
+                    rt1.reservation <> rt2.reservation and r1.restaurant = resto.id and r2.restaurant = resto.id and
+                    resto.id = s.restaurant and extract(isodow from r1.datetime)=s.day_of_week
                                                 and (r1.datetime::time >= s.start_time
                                                  and r2.datetime::time >= s.start_time
                                                  and r1.datetime::time <= s.end_time
                                                  and r2.datetime::time <= s.end_time)
+                    and r1.id = new.id and r2.status in ('completed', 'confirmed')
                     )
              ) then
              raise exception 'Two reservations cannot exist for the same table on the same date for the same service';
@@ -51,7 +52,7 @@ create or replace trigger check_resa_per_table_res
     for each row
     execute function resa_per_table();
 
-create or replace trigger check_resa_per_table_res
+create or replace trigger check_resa_per_table_rt
     before update on reservation_tables
     for each row
     execute function resa_per_table();

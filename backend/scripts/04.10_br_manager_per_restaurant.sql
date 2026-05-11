@@ -7,7 +7,7 @@ set search_path to public;
  create or replace function manager_per_rest() returns trigger as
      $$
      begin
-        if((select count(*) from restaurant_managers where restaurant = old.restaurant) < 1) then
+        if((select count(*) from restaurant_managers where restaurant = old.restaurant) <= 1) then
             raise exception 'Restaurant needs at least one manager';
 
         end if;
