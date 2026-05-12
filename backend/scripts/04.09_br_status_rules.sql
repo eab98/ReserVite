@@ -12,12 +12,12 @@ set search_path to public;
  create or replace function status_rules() returns trigger as
      $$
      begin
-         if(tg_op = 'INSERT' and new.status is distinct from 'pending') then
+         if(tg_op = 'INSERT' and new.status is distinct from 'pending'::status_type) then
              raise exception 'Status must be pending for a new reservation';
-         else if(tg_op = 'UPDATE' and ((old.status = 'pending' and new.status not in ('confirmed', 'cancelled'))
-                     or (old.status = 'confirmed' and new.status not in ('completed', 'cancelled')))) then
+         else if(tg_op = 'UPDATE' and ((old.status = 'pending' and new.status not in ('confirmed'::status_type, 'cancelled'::status_type))
+                     or (old.status = 'confirmed'::status_type and new.status not in ('completed'::status_type, 'cancelled'::status_type)))) then
              raise exception 'Status of the reservation cannot go backwards';
-         else if(tg_op = 'UPDATE' and  old.status in ('completed', 'cancelled')) then
+         else if(tg_op = 'UPDATE' and  old.status in ('completed'::status_type, 'cancelled'::status_type)) then
              raise exception 'Cannot modify a completed or cancelled reservation';
          end if;
          end if;
