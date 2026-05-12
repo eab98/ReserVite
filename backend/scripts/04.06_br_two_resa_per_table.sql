@@ -19,40 +19,43 @@ set search_path to public;
  Table tables:
  */
 
+create or replace function resa_per_table() returns trigger as
+    $$
+    begin
+        if exists (select 1
+                   from reservations resa1, reservations resa2
+                   where resa1.status in ('completed', 'confirmed') and resa2.status in('completed', 'confirmed')
+                   and exists(select 1
+                                  from services s,
+                                       reservation_tables rt1,
+                                       reservation_tables rt2
+                                  where resa1.id = rt1.reservation and resa2.id = rt2.reservation
+                                  and rt1."table" = rt2."table" and rt1.reservation <> rt2.reservation
+                                  and resa1.restaurant = s.restaurant and resa2.restaurant = s.restaurant
+                                    and resa1.datetime::date = resa2.datetime::date
+                                    and extract(isodow from resa1.datetime)=s.day_of_week
+                                    and (resa1.datetime::time >= s.start_time
+                                      and resa2.datetime::time >= s.start_time
+                                      and resa1.datetime::time <= s.end_time
+                                      and resa2.datetime::time <= s.end_time))) then
+            raise exception 'Two reservations cannot exist for the same table on the same date for the same service';
 
- create or replace function resa_per_table() returns trigger as
-     $$
-     begin
-         if (new.status in ('completed', 'confirmed') and
-             exists (select *
-              from reservations r1,
-                   reservations r2,
-                   reservation_tables rt1,
-                   reservation_tables rt2,
-                   restaurants resto,
-                   services s
-              where r1.id = rt1.reservation and r2.id = rt2.reservation and rt1."table" = rt2."table" and r1.datetime =r2.datetime and
-                    rt1.reservation <> rt2.reservation and r1.restaurant = resto.id and r2.restaurant = resto.id and
-                    resto.id = s.restaurant and extract(isodow from r1.datetime)=s.day_of_week
-                                                and (r1.datetime::time >= s.start_time
-                                                 and r2.datetime::time >= s.start_time
-                                                 and r1.datetime::time <= s.end_time
-                                                 and r2.datetime::time <= s.end_time)
-                    and r1.id = new.id and r2.status in ('completed', 'confirmed')
-                    )
-             ) then
-             raise exception 'Two reservations cannot exist for the same table on the same date for the same service';
-         end if;
-        return new;
-     end;
-     $$language plpgsql;
+        end if;
+        return null;
+    end;
+    $$language plpgsql;
 
 create or replace trigger check_resa_per_table_res
-    before update on reservations
+    after update on reservations
     for each row
     execute function resa_per_table();
 
 create or replace trigger check_resa_per_table_rt
-    before update on reservation_tables
+    after update on reservation_tables
     for each row
     execute function resa_per_table();
+
+/*
+update reservation_tables set "table" = 1 where reservation = 4; c'est ok
+update reservations set datetime = '2024-11-15 19:00:00' where id = 4; pas ok
+*/

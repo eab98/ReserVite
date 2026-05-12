@@ -13,6 +13,7 @@
     <script-file value="$PROJECT_DIR$/backend/scripts/04.10_br_manager_per_restaurant.sql" />
     <script-file value="$PROJECT_DIR$/backend/scripts/04.11_br_update_completed_cancelled_resa.sql" />
     <script-file value="$PROJECT_DIR$/backend/scripts/04.12_br_no_table_for_pending_or_cancelled.sql" />
+    <script-file value="$PROJECT_DIR$/backend/scripts/04.04_br_reservation_time.sql" />
     <script-mode>FILE</script-mode>
     <data-source id="6d275bb5-c69c-4f95-bc29-f6a29631655b" namespace="database/&quot;prbd-2526-a03&quot;" />
     <method v="2" />
