@@ -76,8 +76,8 @@ execute procedure restaurant_update();
 create or replace function resa_update() returns trigger as
        $$
        begin
-           if((LOWER(trim(new.restaurant)) is distinct from LOWER(trim(old.restaurant)))
-                  or LOWER(trim(new.client)) is distinct from LOWER(trim(old.client)))then
+           if((new.restaurant is distinct from old.restaurant)
+                  or new.client is distinct from old.client) then
                raise exception 'Cannot modify the restaurant or the cleint of an ongoing reservation';
            end if;
            return new;
