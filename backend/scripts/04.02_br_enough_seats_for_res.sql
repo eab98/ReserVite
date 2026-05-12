@@ -33,7 +33,7 @@ $$
         if exists(select r.id, r.number_of_guests, coalesce(sum(t.capacity), 0) from reservations r
                                 left join reservation_tables rt on r.id = rt.reservation
                                 left join tables t on rt."table" = t.id
-                    where r.status in ('confirmed', 'completed')
+                    where r.status in ('confirmed'::status_type, 'completed'::status_type)
                     group by r.id, r.number_of_guests having r.number_of_guests > coalesce(sum(t.capacity), 0)) then
             raise exception 'Number of guests must be less than or equal to total capacity';
         end if;

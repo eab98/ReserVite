@@ -24,7 +24,8 @@ create or replace function resa_per_table() returns trigger as
     begin
         if exists (select 1
                    from reservations resa1, reservations resa2
-                   where resa1.status in ('completed', 'confirmed') and resa2.status in('completed', 'confirmed')
+                   where resa1.status in ('completed'::status_type, 'confirmed'::status_type)
+                     and resa2.status in('completed'::status_type, 'confirmed'::status_type)
                    and exists(select 1
                                   from services s,
                                        reservation_tables rt1,

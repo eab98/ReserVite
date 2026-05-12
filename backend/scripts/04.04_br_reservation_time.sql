@@ -17,7 +17,7 @@ create or replace function reservation_time() returns trigger as
         begin
             if exists(select 1
                       from reservations resa
-                      where resa.status in ('confirmed', 'pending', 'completed')
+                      where resa.status in ('confirmed'::status_type, 'pending'::status_type, 'completed'::status_type)
                       and not exists(select 1
                                      from services s
                                      where s.restaurant = resa.restaurant and
