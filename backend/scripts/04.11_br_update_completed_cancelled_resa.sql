@@ -7,8 +7,8 @@ set search_path to public;
  create or replace function update_completed_cancelled_resa() returns trigger as
      $$
      begin
-         if(new is distinct from old and (old.status == 'cancelled' || old.status == 'confirmed')) then
-             raise exception 'Cannot modify a cancelled or confirmed reservation';
+         if(new is distinct from old and old.status in ('cancelled', 'completed')) then
+             raise exception 'Cannot modify a cancelled or completed reservation';
          end if;
         return new;
      end;
