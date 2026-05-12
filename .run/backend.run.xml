@@ -9,7 +9,6 @@
     <script-file value="$PROJECT_DIR$/backend/scripts/04.02_br_enough_seats_for_res.sql" />
     <script-file value="$PROJECT_DIR$/backend/scripts/04.03_br_res_belongs_to_rest.sql" />
     <script-file value="$PROJECT_DIR$/backend/scripts/04.06_br_two_resa_per_table.sql" />
-    <script-file value="$PROJECT_DIR$/backend/scripts/04.07_br_no_overlapping_services.sql" />
     <script-file value="$PROJECT_DIR$/backend/scripts/04.09_br_status_rules.sql" />
     <script-file value="$PROJECT_DIR$/backend/scripts/04.10_br_manager_per_restaurant.sql" />
     <script-file value="$PROJECT_DIR$/backend/scripts/04.11_br_update_completed_cancelled_resa.sql" />
@@ -17,6 +16,7 @@
     <script-file value="$PROJECT_DIR$/backend/scripts/04.04_br_reservation_time.sql" />
     <script-file value="$PROJECT_DIR$/backend/scripts/04.05_br_restaurant_slot.sql" />
     <script-file value="$PROJECT_DIR$/backend/scripts/04.08_br_service_time.sql" />
+    <script-file value="$PROJECT_DIR$/backend/scripts/04.14_br_resa_created_past.sql" />
     <script-mode>FILE</script-mode>
     <data-source id="6d275bb5-c69c-4f95-bc29-f6a29631655b" namespace="database/&quot;prbd-2526-a03&quot;" />
     <method v="2" />
