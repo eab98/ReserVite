@@ -88,3 +88,26 @@ create or replace trigger check_resa_update
     before update on reservations
     for each row
     execute procedure resa_update();
+
+
+/*
+ En plus des transitions décrites ci-dessus, le statut d'une réservation peut passer de confirmed à pending
+ uniquement si la réservation est dans le futur (pour permettre l'édition par le client).
+ */
+
+ create or replace function resa_confirmed_to_pending() returns trigger as
+     $$
+     begin
+         if new.status = 'pending' and old.status = 'confirmed' then
+             if new.datetime < coalesce((select system_time.simulated_time from system_time), now()) then
+                 raise exception 'Reservation must be in the future to change its status in this way';
+             end if;
+         end if;
+         return  new;
+     end;
+     $$language plpgsql;
+
+create or replace trigger check_resa_confirmed_to_pending
+    before update of status on reservations
+    for each row
+    execute procedure resa_confirmed_to_pending();
