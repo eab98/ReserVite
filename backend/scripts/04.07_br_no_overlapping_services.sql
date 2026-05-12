@@ -18,7 +18,7 @@ create or replace function check_no_overlapping_services()
 returns trigger as
 $$
     begin
-        if exists(select 1 from services s where s.id != new.id
+        if exists(select 1 from services s where s.id is distinct from new.id
                                             and s.day_of_week = new.day_of_week
                                             and s.restaurant = new.restaurant
                                             and (s.start_time, s.end_time) overlaps (new.start_time, new.end_time)) then
