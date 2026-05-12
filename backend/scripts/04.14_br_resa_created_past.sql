@@ -8,23 +8,32 @@ set search_path to public;
  ==========================================
  */
 
+/*
+ coalesce prend deux param et retourne le premier qui est non null (plus court qu'un double exist)
+ */
 
 create or replace function resa_created_past() returns trigger as
     $$
     begin
-        if exists(select st.simulated_time
-                  from system_time st) then
-            if exists(select st.simulated_time
-                      from system_time st, reservations r
-                      where r.id = new.id and r.datetime < st.simulated_time) then
-                raise exception 'Cannot create a reservation in the past';
-            end if;
-        else
-            if new.datetime < now() then
-                raise exception 'Cannot create a reservation in the past';
-            end if;
+        if new.datetime < coalesce(
+                          (select system_time.simulated_time from system_time),
+                          now()
+                          ) then
+            raise exception 'Cannot create a reservation in the past';
         end if;
         return new;
     end;
     $$language plpgsql;
 
+create or replace trigger check_resa_created_past
+    before insert on reservations
+    for each row
+    execute function resa_created_past();
+
+
+/*insert into reservations (client, restaurant, datetime, number_of_guests, status)
+values (3, 3, '2024-11-01 19:00', 2, 'pending');
+
+insert into reservations (client, restaurant, datetime, number_of_guests, status)
+values (3, 3, '2025-06-04 19:00', 2, 'pending');
+*/
