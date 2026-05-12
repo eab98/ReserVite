@@ -31,8 +31,8 @@ create or replace trigger check_service_time_on_restaurant
     for each row
 execute function service_time();
 
-insert into services (restaurant, day_of_week, start_time, end_time)
+/*insert into services (restaurant, day_of_week, start_time, end_time)
 values (2, 1, '12:17', '14:00');
 
 insert into services (restaurant, day_of_week, start_time, end_time)
-values (2, 3, '18:07', '22:30');
+values (2, 3, '18:07', '22:30');*/
