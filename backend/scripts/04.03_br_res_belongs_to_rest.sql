@@ -12,7 +12,7 @@ set search_path to public;
 create or replace function check_same_restaurant() returns trigger as
 $$
     begin
-        if (select reservations.restaurant from reservations where reservations.id = new.reservation) !=
+        if (select reservations.restaurant from reservations where reservations.id = new.reservation) is distinct from
            (select tables.restaurant from tables where tables.id = new."table") then
             raise exception 'Table must be in the same restaurant as reservation';
         end if;
