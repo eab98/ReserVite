@@ -22,7 +22,8 @@ set search_path to public;
 create or replace function check_status_for_new_tables() returns trigger as
 $$
     begin
-        if new.reservation in (select reservations.id from reservations where reservations.status in ('pending', 'cancelled')) then
+        if new.reservation in (select reservations.id from reservations
+                        where reservations.status in ('pending'::status_type, 'cancelled'::status_type)) then
             raise exception 'A table cannot be associated with a pending or cancelled reservation';
         end if;
         return new;
@@ -32,7 +33,7 @@ $$ language plpgsql;
 create or replace function check_no_tables() returns trigger as
 $$
     begin
-        if new.status in ('pending', 'cancelled') and new.id in (select rt.reservation from reservation_tables rt) then
+        if new.status in ('pending'::status_type, 'cancelled'::status_type) and new.id in (select rt.reservation from reservation_tables rt) then
             raise exception 'A table cannot be associated with a pending or cancelled reservation';
         end if;
         return new;

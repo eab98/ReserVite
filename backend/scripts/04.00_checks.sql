@@ -134,4 +134,4 @@ ALTER TABLE reservations DROP CONSTRAINT IF EXISTS status_check;
 
 
 alter table reservations add constraint status_check
- check( status in ('pending', 'confirmed', 'cancelled', 'completed')) not valid;
+ check( status in ('pending'::status_type, 'confirmed'::status_type, 'cancelled'::status_type, 'completed'::status_type)) not valid;
