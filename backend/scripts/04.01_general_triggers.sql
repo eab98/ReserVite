@@ -31,7 +31,7 @@ create or replace function update_restaurant_table()
 returns trigger as
     $$
     begin
-        if(LOWER(trim(new.restaurant)) is distinct from LOWER(trim(old.restaurant))) then
+        if new.restaurant is distinct from old.restaurant then
             raise exception 'Cannot modify the restaurant';
         end if;
         return new;

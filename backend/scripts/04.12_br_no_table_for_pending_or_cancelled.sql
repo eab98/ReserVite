@@ -41,7 +41,9 @@ $$
 $$ language plpgsql;
 
 create or replace trigger check_not_pending_or_cancelled
-before insert or update on reservation_tables
+after insert or update
+    on reservation_tables
+    deferrable initially deferred
     for each row
     execute procedure check_status_for_new_tables();
 
