@@ -40,7 +40,7 @@ $$
     end;
 $$ language plpgsql;
 
-create or replace trigger check_not_pending_or_cancelled
+create constraint trigger check_not_pending_or_cancelled
 after insert or update
     on reservation_tables
     deferrable initially deferred
