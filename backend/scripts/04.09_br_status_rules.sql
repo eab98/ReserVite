@@ -12,6 +12,9 @@ set search_path to public;
  create or replace function status_rules() returns trigger as
      $$
      begin
+         if(tg_op = 'UPDATE' and new.status = old.status) then
+             return new;
+         end if;
          if(tg_op = 'INSERT' and new.status is distinct from 'pending'::status_type) then
              raise exception 'Status must be pending for a new reservation';
          else if(tg_op = 'UPDATE' and ((old.status = 'pending' and new.status not in ('confirmed'::status_type, 'cancelled'::status_type))
