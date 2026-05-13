@@ -51,7 +51,7 @@ create trigger forbid_update_restaurant_table
  create or replace function restaurant_update() returns trigger as
 $$
      begin
-         if new.restaurant is distinct from services.restaurant then
+         if new.restaurant is distinct from old.restaurant then
              raise exception 'Cannot modify the restaurant for a service';
          end if;
          return new;
