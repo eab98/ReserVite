@@ -47,12 +47,12 @@ create or replace function resa_per_table() returns trigger as
     $$language plpgsql;
 
 create or replace trigger check_resa_per_table_res
-    after update on reservations
+    after insert or update on reservations
     for each row
     execute function resa_per_table();
 
 create or replace trigger check_resa_per_table_rt
-    after update on reservation_tables
+    after insert or update on reservation_tables
     for each row
     execute function resa_per_table();
 
