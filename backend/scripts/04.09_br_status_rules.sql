@@ -15,11 +15,11 @@ set search_path to public;
          if(tg_op = 'INSERT' and new.status is distinct from 'pending'::status_type) then
              raise exception 'Status must be pending for a new reservation';
          else if(tg_op = 'UPDATE' and ((old.status = 'pending' and new.status not in ('confirmed'::status_type, 'cancelled'::status_type))
-                     or (old.status = 'confirmed'::status_type and new.status not in ('completed'::status_type, 'cancelled'::status_type)))) then
+                     or (old.status = 'confirmed'::status_type and new.status not in ('completed'::status_type, 'cancelled'::status_type, 'pending'::status_type)))) then
              raise exception 'Status of the reservation cannot go backwards';
          else if(tg_op = 'UPDATE' and  old.status in ('completed'::status_type, 'cancelled'::status_type)) then
              raise exception 'Cannot modify a completed or cancelled reservation';
-         else if(new.status = 'pending' and old.status = 'confirmed' and new.datetime < coalesce((select system_time.simulated_time from system_time), now())) then
+         else if(tg_op = 'UPDATE' and new.status = 'pending' and old.status = 'confirmed' and new.datetime < coalesce((select system_time.simulated_time from system_time), now())) then
              raise exception 'Reservation must be in the future to change its status in this way';
          end if;
          end if;
