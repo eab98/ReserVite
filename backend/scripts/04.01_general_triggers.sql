@@ -111,3 +111,30 @@ create or replace trigger check_resa_confirmed_to_pending
     before update of status on reservations
     for each row
     execute procedure resa_confirmed_to_pending();
+
+/*
+ =======================================================
+ PREVENT UPDATE RESERVATION_TABLES ET RESTAURANT_MANAGER
+ =======================================================
+ */
+
+ create or replace function check_no_update()
+ returns trigger as
+$$
+     begin
+         if old is distinct from new then
+             raise exception 'Primary keys cannot be updated';
+         end if;
+         return new;
+     end;
+$$ language plpgsql;
+
+create or replace trigger no_update_rest_manager
+before update on restaurant_managers
+    for each row
+execute procedure check_no_update();
+
+create or replace trigger no_update_rest_manager
+    before update on reservation_tables
+    for each row
+execute procedure check_no_update();
