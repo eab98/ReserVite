@@ -34,7 +34,7 @@ alter table restaurants add constraint city_length
 alter table restaurants drop constraint if exists check_phone_number_format;
 
 alter table restaurants add constraint check_phone_number_format
-    check ( restaurants.phone ~ '^(?:0\d(?:\s?\d{3})(?:\s?\d{2}){2}|0\d{2}(?:\s?\d{2}){3})$' ) not valid;
+    check ( restaurants.phone ~ '^\+32\s?\d{1,3}(?:\s?\d{2,3}){2,3}$' ) not valid;
 /*check ( restaurants.phone ~ '^0\d(?:\s?\d{3})(?:\s?\d{2}){2}$' || restaurants.phone ~ '^0\d{2}(?:\s?\d{2}){3}$' ||
     restaurants.phone ~ '^04\d{2}(?:\s?\d{2}){3}$') not valid;*/
 
