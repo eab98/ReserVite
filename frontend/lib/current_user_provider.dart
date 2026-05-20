@@ -20,11 +20,11 @@ class CurrentUserNotifier extends AsyncNotifier<String?> {
     state = const AsyncLoading();
     try {
       var token = await Security.login(email, password);
-      await Params.setValue('token', token);
+       Params.setValue('token', token);
       state = AsyncData(token);
     }catch(e){
       state = AsyncError(
-        "Something went wrong!\nPlease try again later.",
+        "Something went wrong!\nPlease try again later.\n" + StackTrace.current.toString(),
         StackTrace.current,
       );
     }

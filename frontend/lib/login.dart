@@ -180,7 +180,7 @@ class LoginScreen extends ConsumerStatefulWidget {
                       children: [
                         Expanded(
                           child: OutlinedButton.icon(
-                            onPressed: () {},
+                            onPressed: () => _login(context, 'brlacroix@epfc.eu', 'Password1,'),
                             icon: const Icon(Icons.person),
                             label: const Text('Client (Bruno)'),
                             style: OutlinedButton.styleFrom(
@@ -191,7 +191,7 @@ class LoginScreen extends ConsumerStatefulWidget {
                         const SizedBox(width: 8),
                         Expanded(
                           child: OutlinedButton.icon(
-                            onPressed: () {},
+                            onPressed: () => _login(context, 'mamichel@epfc.eu', 'Password1,'),
                             icon: const Icon(Icons.person),
                             label: const Text('Client (Marc)'),
                             style: OutlinedButton.styleFrom(
@@ -206,7 +206,7 @@ class LoginScreen extends ConsumerStatefulWidget {
                       children: [
                         Expanded(
                           child: OutlinedButton.icon(
-                            onPressed: () {},
+                            onPressed: () => _login(context, 'bepenelle@epfc.eu', 'Password1,'),
                             icon: const Icon(Icons.manage_accounts),
                             label: const Text('Manager (Benoît)'),
                             style: OutlinedButton.styleFrom(
@@ -217,7 +217,7 @@ class LoginScreen extends ConsumerStatefulWidget {
                         const SizedBox(width: 8),
                         Expanded(
                           child: OutlinedButton.icon(
-                            onPressed: () {},
+                            onPressed: () => _login(context, 'gedielman@epfc.eu', 'Password1,'),
                             icon: const Icon(Icons.manage_accounts),
                             label: const Text('Manager (Geoffrey)'),
                             style: OutlinedButton.styleFrom(
@@ -262,7 +262,7 @@ class LoginScreen extends ConsumerStatefulWidget {
           error: (error, _) =>
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Email ou mot de passe incorrect'),
+                content: Text(error.toString()),
                 backgroundColor: Colors.red,
               ),
             ),
