@@ -24,9 +24,22 @@ class CurrentUserNotifier extends AsyncNotifier<String?> {
       state = AsyncData(token);
     }catch(e){
       state = AsyncError(
-        "Something went wrong!\nPlease try again later.\n" + StackTrace.current.toString(),
+        "Something went wrong!\nPlease try again later.",
         StackTrace.current,
       );
     }
   }
+
+  Future<void> resetDataBase() async {
+    state = const AsyncLoading();
+    try {
+      await Security.resetDataBase();
+      Params.clearAll();
+      state = const AsyncData(null);
+    } catch (e){
+      state = AsyncError("Could not reset data base.\nPlease try again later.", StackTrace.current);
+    }
+
+  }
+
 }

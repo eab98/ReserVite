@@ -231,7 +231,7 @@ class LoginScreen extends ConsumerStatefulWidget {
                     SizedBox(
                       width: double.infinity,
                       child: OutlinedButton.icon(
-                        onPressed: () {},
+                        onPressed: () => _resetDataBase(),
                         icon: const Icon(Icons.refresh),
                         label: const Text('Réinitialiser la base de données'),
                         style: OutlinedButton.styleFrom(
@@ -283,4 +283,30 @@ class LoginScreen extends ConsumerStatefulWidget {
     
     bool get _isFormValid =>
         _emailController.isValid == true && _passwordController.isValid == true;
+
+    Future<void> _resetDataBase() async {
+      await ref.read(currentUserProvider.notifier).resetDataBase();
+      var securityState = ref.read(currentUserProvider);
+
+      if(!context.mounted) return;
+
+      securityState.when(
+        data: (_) =>
+          ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Base de données réinitialisée."),
+          backgroundColor: Colors.green,
+        ),
+      ),
+
+        error: (error, _) =>
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(error.toString()),
+                backgroundColor: Colors.red,
+              ),
+            ),
+        loading: () {},
+      );
+    }
   }

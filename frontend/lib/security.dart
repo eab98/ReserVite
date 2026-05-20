@@ -37,4 +37,17 @@ class Security {
       throw Exception('Failed to get user');
   }
   }
+
+  static Future<String?> resetDataBase() async {
+    final response = await ApiClient.post(
+      'reset_database',
+      anonymous: true,
+    );
+
+    if(response.statusCode != 204){
+      throw Exception('Failed to reset data base');
+    }
+
+    return null;
+  }
 }
