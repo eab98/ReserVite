@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:prbd_2526_a03/login.dart';
-import 'package:prbd_2526_a03/params.dart';
+import 'package:prbd_2526_a03/core/tools/params.dart';
+
+import 'package:prbd_2526_a03/views/login.dart';
 
 
 void main() async {

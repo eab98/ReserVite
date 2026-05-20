@@ -1,6 +1,6 @@
 import 'package:async/async.dart';
 import 'package:flutter/material.dart';
-import 'package:prbd_2526_a03/debounce.dart';
+import 'package:prbd_2526_a03/core/tools/debounce.dart';
 
 /// Un contrôleur de texte qui étend [TextEditingController] avec des fonctionnalités
 /// de validation automatique.

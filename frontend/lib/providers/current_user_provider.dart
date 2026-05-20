@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:prbd_2526_a03/security.dart';
-import 'package:prbd_2526_a03/params.dart';
+import 'package:prbd_2526_a03/core/services/security.dart';
+import 'package:prbd_2526_a03/core/tools/params.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
 

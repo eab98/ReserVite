@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:prbd_2526_a03/current_user_provider.dart';
+import 'package:prbd_2526_a03/providers/current_user_provider.dart';
 import 'package:prbd_2526_a03/models/user.dart';
-import 'package:prbd_2526_a03/validating_text_editing_controller.dart';
+import 'package:prbd_2526_a03/core/tools/validating_text_editing_controller.dart';
 
 
 class LoginScreen extends ConsumerStatefulWidget {

@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
-import 'package:prbd_2526_a03/api_client.dart';
+import 'package:prbd_2526_a03/core/services/api_client.dart';
 
 class Security {
   // static Future<bool> checkEmail({String? email}) async {
