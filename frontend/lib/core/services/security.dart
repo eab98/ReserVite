@@ -4,19 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:prbd_2526_a03/core/services/api_client.dart';
 
 class Security {
-  // static Future<bool> checkEmail({String? email}) async {
-  //   final response = await ApiClient.post(
-  //     'does_email_exists',
-  //     body: json.encode({'email': email}),
-  //     anonymous: true,
-  //   );
-  //
-  //   final dynamic body = json.decode(response.body);
-  //   if (response.statusCode != 200){
-  //     throw Exception('No account linked to this email');
-  //   }
-  //   return body;
-  // }
 
   static Future<String?> login(String email, String password) async {
     try {
@@ -38,7 +25,7 @@ class Security {
   }
   }
 
-  static Future<String?> resetDataBase() async {
+  static Future<void> resetDataBase() async {
     final response = await ApiClient.post(
       'reset_database',
       anonymous: true,
@@ -48,6 +35,54 @@ class Security {
       throw Exception('Failed to reset data base');
     }
 
-    return null;
+  }
+
+  static Future<bool> checkEmail({String? email}) async {
+    final response = await ApiClient.post(
+      'check_email_available',
+      body: json.encode({'email': email}),
+      anonymous: true,
+    );
+    if (response.statusCode != 200){
+      throw Exception('Could not check the email');
+    }
+
+    final dynamic body = json.decode(response.body);
+
+    return body;
+  }
+
+  static Future<bool> checkFullName({String? fullName}) async {
+    final response = await ApiClient.post(
+      'check_full_name_available',
+      body: json.encode({'full_name': fullName}),
+      anonymous: true,
+    );
+
+    if (response.statusCode != 200){
+      throw Exception('Could not check the full name');
+    }
+
+    final dynamic body = json.decode(response.body);
+
+    return body;
+  }
+  
+  static Future<void> signup(String fullName, String email, String password, String? phone) async{
+    final response = await ApiClient.post(
+      'save_user',
+      body : json.encode({
+        '_full_name': fullName,
+        '_email': email,
+        '_password': password,
+        '_phone': phone
+      }),
+      anonymous: true,
+    );
+
+    if(response.statusCode != 204){
+      throw Exception('Failed to create new user');
+    }
+
   }
 }

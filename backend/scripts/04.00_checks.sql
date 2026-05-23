@@ -11,6 +11,13 @@ set search_path to public;
 alter table users add constraint name_length
 check ( length(trim(users.full_name)) >= 3 ) NOT VALID;
 
+
+alter table users add constraint password_format
+check (users.password ~ '^\$2[aby]\$\d{2}\$[./A-Za-z0-9]{53}$'
+          OR
+          users.password ~ '^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[,;.:!?/$%&@#]).{8,}$'
+      ) NOT VALID;
+
 /*
  ==========================================
  TABLE RESTAURANTS
