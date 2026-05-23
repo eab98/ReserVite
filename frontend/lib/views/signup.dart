@@ -1,28 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 
-void main() async {
-  await initializeDateFormatting('fr_FR', null);
-  runApp(
-    MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
-      home: const SignupMockupScreen(),
-    ),
-  );
+
+class SignupScreen extends ConsumerStatefulWidget {
+  const SignupScreen({super.key});
+
+  @override
+  ConsumerState<SignupScreen> createState() => _SignupScreenState();
 }
 
-class SignupMockupScreen extends StatelessWidget {
-  const SignupMockupScreen({super.key});
+  class _SignupScreenState extends ConsumerState<SignupScreen>{
+
+  //controllers
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final simulatedTime = DateTime(2024, 12, 4, 16, 0);
+
 
     return Scaffold(
       appBar: AppBar(
