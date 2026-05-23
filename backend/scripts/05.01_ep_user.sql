@@ -11,7 +11,7 @@ create or replace function check_email_available(email text)
     begin
         return not exists(select 1 from users where trim(lower(users.email)) = trim(lower(check_email_available.email)));
     end;
-       $$language plpgsql;
+       $$language plpgsql security definer ;
 
 grant execute on function check_email_available to anon;
 
@@ -22,16 +22,16 @@ create or replace function check_full_name_available(full_name text)
     begin
         return not exists(select 1 from users where trim(lower(users.full_name)) = trim(lower(check_full_name_available.full_name)));
     end;
-    $$language plpgsql;
+    $$language plpgsql security definer ;
 
 grant execute on function check_full_name_available to anon;
 
 
-create or replace function save_user(_full_name text, _email text, _password text, _phone_number text default null)
+create or replace function save_user(_full_name text, _email text, _password text, _phone text default null)
     returns void as
     $$
     begin
-        insert into users (email, password, full_name, role, phone) values (_email, _password, _full_name, 'client', _phone_number);
+        insert into users (email, password, full_name, role, phone) values (_email, _password, _full_name, 'client', _phone);
     end;
     $$language plpgsql security definer ;
 
