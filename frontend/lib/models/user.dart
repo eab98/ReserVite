@@ -46,7 +46,8 @@ class User {
   }
 
   static Future<String?> validateFullNameUnicity(String? fullName) async{
-
+    var res = await Security.checkFullName(fullName: fullName?.trim());
+    return res ? null : 'Ce nom complet est déjà utilisé';
   }
 
   static String? validateEmailSignup(String? email){
@@ -60,7 +61,8 @@ class User {
   }
 
   static Future<String?> validateEmailUnicity(String? email) async {
-
+    var res = await Security.checkEmail(email: email?.trim());
+    return res ? null : 'Cet email est déjà utilisé';
   }
 
   static String? validatePasswordSignup(String? password){
@@ -81,8 +83,14 @@ class User {
     }
   }
 
-  static String? validateMatchingPassword(String? passwordConfirm) {
-
+  static String? validateMatchingPassword(String? value, String? password) {
+    if(value == null || value.isEmpty) {
+      return 'Veuillez valider le mot de passe';
+    } else if(value != password) {
+      return 'Les deux mots de passe doivent être identiques';
+    } else {
+      return null;
+    }
   }
 
 
