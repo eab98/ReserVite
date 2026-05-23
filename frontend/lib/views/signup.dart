@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:prbd_2526_a03/core/tools/validating_text_editing_controller.dart';
+import 'package:prbd_2526_a03/models/user.dart';
+import 'package:prbd_2526_a03/providers/current_user_provider.dart';
+import 'package:prbd_2526_a03/views/login.dart';
 
 
 class SignupScreen extends ConsumerStatefulWidget {
@@ -13,7 +17,78 @@ class SignupScreen extends ConsumerStatefulWidget {
 
   class _SignupScreenState extends ConsumerState<SignupScreen>{
 
-  //controllers
+    final _fullNameController = ValidatingTextEditingController(
+      validator: User.validateFullNameFormat,
+      asyncValidator: User.validateFullNameUnicity,
+      initialValue: ''
+    );
+
+    final _emailController = ValidatingTextEditingController(
+      validator: User.validateEmailSignup,
+      asyncValidator: User.validateEmailUnicity,
+      initialValue: ''
+    );
+
+    final _passwordController = ValidatingTextEditingController(
+      validator: User.validatePasswordSignup,
+      initialValue: ''
+    );
+
+    //late car il dépend d'un autre controller (mdp)
+    late final ValidatingTextEditingController _confirmPasswordController;
+
+    final _phoneController = ValidatingTextEditingController(
+      initialValue: ''
+    );
+
+  @override
+  void initState() {
+    super.initState();
+    _fullNameController.onAfterValidated = () => setState(() {});
+    _emailController.onAfterValidated = () => setState(() {});
+    _passwordController.onAfterValidated = () => setState(() {});
+    _confirmPasswordController = ValidatingTextEditingController(
+      validator: (value) => User.validateMatchingPassword(value, _passwordController.text)
+    );
+    _confirmPasswordController.onAfterValidated = () => setState(() {});
+  }
+
+  @override
+  void dispose(){
+    _fullNameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    _phoneController.dispose();
+    super.dispose();
+  }
+
+
+    Future<void> _submit(BuildContext context) async {
+      if(!await _validateForm()) return;
+      await ref
+        .read(currentUserProvider.notifier)
+        .signup(
+          _fullNameController.text.trim(),
+          _emailController.text.trim(),
+          _passwordController.text.trim(),
+          _phoneController.text.trim()
+      );
+    }
+
+    Future<bool> _validateForm() async {
+      await _fullNameController.validateAndWait();
+      await _emailController.validateAndWait();
+      await _passwordController.validateAndWait();
+      await _confirmPasswordController.validateAndWait();
+      return _isFormValid;
+    }
+
+    bool get _isFormValid =>
+        _fullNameController.isValid == true &&
+        _emailController.isValid == true &&
+        _passwordController.isValid == true &&
+        _confirmPasswordController.isValid == true;
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +108,7 @@ class SignupScreen extends ConsumerStatefulWidget {
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: 'Rafraîchir les données',
-            onPressed: () {},
+            onPressed: () => LoginScreen {},
           ),
         ],
         elevation: 2,
