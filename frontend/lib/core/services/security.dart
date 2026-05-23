@@ -25,7 +25,7 @@ class Security {
   }
   }
 
-  static Future<String?> resetDataBase() async {
+  static Future<void> resetDataBase() async {
     final response = await ApiClient.post(
       'reset_database',
       anonymous: true,
@@ -35,7 +35,6 @@ class Security {
       throw Exception('Failed to reset data base');
     }
 
-    return null;
   }
 
   static Future<bool> checkEmail({String? email}) async {
@@ -67,5 +66,23 @@ class Security {
     final dynamic body = json.decode(response.body);
 
     return body;
+  }
+  
+  static Future<void> signup(String fullName, String email, String password, String? phone) async{
+    final response = await ApiClient.post(
+      'save_user',
+      body : json.encode({
+        '_full_name': fullName,
+        '_email': email,
+        '_password': password,
+        '_phone': phone
+      }),
+      anonymous: true,
+    );
+
+    if(response.statusCode != 204){
+      throw Exception('Failed to create new user');
+    }
+
   }
 }

@@ -25,3 +25,21 @@ create or replace function check_full_name_available(full_name text)
     $$language plpgsql;
 
 grant execute on function check_full_name_available to anon;
+
+
+create or replace function save_user(_full_name text, _email text, _password text, _phone_number text default null)
+    returns void as
+    $$
+    begin
+        insert into users (email, password, full_name, role, phone) values (_email, _password, _full_name, 'client', _phone_number);
+    end;
+    $$language plpgsql security definer ;
+
+grant execute on function save_user to anon;
+
+
+select save_user('Test', 'test@example.com', 'Password1,');
+
+select id, email, full_name, role, phone from users where email = 'test@example.com';
+
+delete from users where email = 'test@example.com';
