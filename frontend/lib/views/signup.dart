@@ -5,7 +5,6 @@ import 'package:intl/intl.dart';
 import 'package:prbd_2526_a03/core/tools/validating_text_editing_controller.dart';
 import 'package:prbd_2526_a03/models/user.dart';
 import 'package:prbd_2526_a03/providers/current_user_provider.dart';
-import 'package:prbd_2526_a03/views/login.dart';
 
 
 class SignupScreen extends ConsumerStatefulWidget {
@@ -74,7 +73,21 @@ class SignupScreen extends ConsumerStatefulWidget {
           _passwordController.text.trim(),
           _phoneController.text.trim()
       );
-    }
+      var securityState = ref.read(currentUserProvider);
+
+      if(!context.mounted) {
+        return;
+      }
+
+      securityState.when(
+          data: (_) => Navigator.pushReplacementNamed(
+              context, '/home'),
+          error: (error, _) => null,
+          loading: () {}
+      );
+
+
+      }
 
     Future<bool> _validateForm() async {
       await _fullNameController.validateAndWait();
@@ -108,7 +121,7 @@ class SignupScreen extends ConsumerStatefulWidget {
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: 'Rafraîchir les données',
-            onPressed: () => LoginScreen {},
+            onPressed: () {},
           ),
         ],
         elevation: 2,
@@ -158,51 +171,63 @@ class SignupScreen extends ConsumerStatefulWidget {
                 ),
                 const SizedBox(height: 32),
                 TextFormField(
-                  decoration: const InputDecoration(
+                  controller: _fullNameController,
+                  decoration: InputDecoration(
                     labelText: 'Nom complet',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.person),
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.person),
+                    errorText: _fullNameController.errorText,
                   ),
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
-                  decoration: const InputDecoration(
+                  controller: _emailController,
+                  decoration: InputDecoration(
                     labelText: 'Email',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.email),
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.email),
+                    errorText: _emailController.errorText,
                   ),
                   keyboardType: TextInputType.emailAddress,
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
-                  decoration: const InputDecoration(
+                  controller: _passwordController,
+                  decoration: InputDecoration(
                     labelText: 'Mot de passe',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.lock),
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.lock),
+                    errorText: _passwordController.errorText,
                   ),
                   obscureText: true,
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
-                  decoration: const InputDecoration(
+                  controller: _confirmPasswordController,
+                  decoration: InputDecoration(
                     labelText: 'Confirmer le mot de passe',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.lock_outline),
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.lock_outline),
+                    errorText: _confirmPasswordController.errorText,
+
                   ),
                   obscureText: true,
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
-                  decoration: const InputDecoration(
+                  controller: _phoneController,
+                  decoration: InputDecoration(
                     labelText: 'Téléphone (optionnel)',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.phone),
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.phone),
+                    errorText: _phoneController.errorText,
+
                   ),
                   keyboardType: TextInputType.phone,
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () => _submit(context),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
@@ -210,7 +235,7 @@ class SignupScreen extends ConsumerStatefulWidget {
                 ),
                 const SizedBox(height: 16),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: ()  => Navigator.pushNamed(context, '/login'),
                   child: const Text('Déjà un compte ? Se connecter'),
                 ),
               ],
