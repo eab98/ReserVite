@@ -4,6 +4,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:prbd_2526_a03/core/tools/params.dart';
 
 import 'package:prbd_2526_a03/views/login.dart';
+import 'package:prbd_2526_a03/views/my_restaurants.dart';
 import 'package:prbd_2526_a03/views/signup.dart';
 
 
@@ -20,7 +21,8 @@ void main() async {
       home: LoginScreen(),
       routes: {
         '/login' :(context) => const LoginScreen(),
-        '/signup' : (context) => const SignupScreen()
+        '/signup' : (context) => const SignupScreen(),
+        '/home' : (context) => const MyRestaurantsScreen()
       }
     ),
   )

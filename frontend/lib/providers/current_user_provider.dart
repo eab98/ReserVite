@@ -54,4 +54,9 @@ class CurrentUserNotifier extends AsyncNotifier<String?> {
     }
   }
 
+  Future<void> logout() async {
+    await Params.clearAll();
+    state = AsyncData(null);
+  }
+
 }
