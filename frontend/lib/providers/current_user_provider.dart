@@ -42,4 +42,16 @@ class CurrentUserNotifier extends AsyncNotifier<String?> {
 
   }
 
+  Future<void> signup(String fullName, String email, String password, String? phone) async {
+    state = const AsyncLoading();
+    try{
+      await Security.signup(fullName, email, password, phone);
+      var token = await Security.login(email, password);
+      Params.setValue('token', token);
+      state = AsyncData(token);
+    } catch (e){
+      state = AsyncError('"Something went wrong!\nPlease try again later."', StackTrace.current);
+    }
+  }
+
 }

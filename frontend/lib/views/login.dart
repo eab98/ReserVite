@@ -143,7 +143,7 @@ class LoginScreen extends ConsumerStatefulWidget {
                         ),
                         const SizedBox(height: 6),
                         TextButton(
-                          onPressed: () {},
+                          onPressed: () => Navigator.pushNamed(context, '/signup'),
                           child: const Text(
                             'Pas encore de compte ? S\'inscrire',
                           ),
