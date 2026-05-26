@@ -20,7 +20,7 @@ create or replace function get_my_reservations()
         from reservations resa, restaurants resto
         where resa.restaurant = resto.id and resa.client = auth.id();
     end;
-    $$language plpgsql;
+    $$language plpgsql security definer;;
 
 grant execute on function get_my_reservations() to authenticated;
 

@@ -5,14 +5,14 @@ import 'package:prbd_2526_a03/providers/client_state_provider.dart';
 import 'package:prbd_2526_a03/providers/current_user_provider.dart';
 
 
-class MyReservationsScreen extends ConsumerStatefulWidget {
-  const MyReservationsScreen({super.key});
+class MyRestaurantsScreen extends ConsumerStatefulWidget {
+  const MyRestaurantsScreen({super.key});
 
   @override
-  ConsumerState<MyReservationsScreen> createState() => _MyReservationsScreen();
+  ConsumerState<MyRestaurantsScreen> createState() => _MyRestaurantsScreen();
 }
 
-class _MyReservationsScreen extends ConsumerState<MyReservationsScreen> {
+class _MyRestaurantsScreen extends ConsumerState<MyRestaurantsScreen> {
   
   Future<void> _logout(BuildContext context) async{
     await ref.read(currentUserProvider.notifier).logout();

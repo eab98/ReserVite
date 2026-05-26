@@ -23,8 +23,4 @@ class ClientStateNotifier extends AsyncNotifier<List<Reservation>>{
     }
   }
 
-  List<Reservation> _filterByStatus(List<Reservation> unfilteredList, String status){
-    if(status == 'all') return unfilteredList;
-    return unfilteredList.where((r) => r.status==status).toList();
-  }
 }

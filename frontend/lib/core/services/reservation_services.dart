@@ -11,7 +11,7 @@ class ReservationServices {
     );
 
     if(response.statusCode != 200){
-      throw Exception('Failed to get restaurants');
+      throw Exception('Failed to get reservations');
     }
 
     final dynamic body = json.decode(response.body);
