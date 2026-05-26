@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
-import 'package:prbd_2526_a03/providers/current_user_provider.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
+import '../providers/current_user_provider.dart';
 
 class MyReservationsScreen extends ConsumerStatefulWidget {
   const MyReservationsScreen({super.key});
@@ -12,23 +12,26 @@ class MyReservationsScreen extends ConsumerStatefulWidget {
 }
 
 class _MyReservationsScreen extends ConsumerState<MyReservationsScreen> {
-  
+
   Future<void> _logout(BuildContext context) async{
     await ref.read(currentUserProvider.notifier).logout();
     if(!context.mounted) return;
     Navigator.pushReplacementNamed(context, '/login');
-  } 
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final simulatedTime = DateTime(2024, 12, 4, 16, 0);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mes restaurants'),
+        title: const Text('Mes réservations'),
         automaticallyImplyLeading: false,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {},
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: 'Rafraîchir les données',
@@ -36,7 +39,7 @@ class _MyReservationsScreen extends ConsumerState<MyReservationsScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.logout),
-            tooltip: 'Déconnexion (Benoît P.)',
+            tooltip: 'Déconnexion',
             onPressed: () => _logout(context),
           ),
         ],
@@ -50,11 +53,9 @@ class _MyReservationsScreen extends ConsumerState<MyReservationsScreen> {
             child: Padding(
               padding: const EdgeInsets.only(top: 2.0),
               child: Tooltip(
-                message:
-                'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
+                message: 'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
                 child: Text(
-                  DateFormat('EEEE dd/MM/yyyy HH:mm', 'fr_FR')
-                      .format(simulatedTime),
+                  'mercredi 04/12/2024 16:00',
                   style: TextStyle(
                     fontSize: 10,
                     color: Colors.grey[400],
@@ -67,164 +68,307 @@ class _MyReservationsScreen extends ConsumerState<MyReservationsScreen> {
         ),
       ),
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(16.0),
+        child: Column(
           children: [
-            Card(
-              margin: const EdgeInsets.only(bottom: 8),
-              child: ListTile(
-                leading: const Icon(Icons.restaurant, size: 40),
-                title: const Text('Le Gourmet'),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.location_on, size: 14, color: Colors.grey),
-                        const SizedBox(width: 4),
-                        const Text('Bruxelles'),
-                        const SizedBox(width: 12),
-                        const Icon(Icons.star, size: 14, color: Colors.amber),
-                        const SizedBox(width: 2),
-                        Text(
-                          '4.5',
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                        ),
-                        const SizedBox(width: 12),
-                        Text(
-                          '€€€',
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        const Icon(Icons.access_time, size: 14, color: Colors.grey),
-                        const SizedBox(width: 4),
-                        Text(
-                          'Dernière réservation: mer. 04/12/2024',
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    const Row(
-                      children: [
-                        Icon(Icons.pending, size: 14, color: Colors.orange),
-                        SizedBox(width: 4),
-                        Text(
-                          '2 demandes en attente',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.orange,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () {},
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0),
+              child: SegmentedButton<String>(
+                showSelectedIcon: false,
+                segments: const [
+                  ButtonSegment(
+                    value: 'all',
+                    icon: Icon(Icons.list, size: 24),
+                    tooltip: 'Toutes',
+                  ),
+                  ButtonSegment(
+                    value: 'pending',
+                    icon: Icon(Icons.pending, size: 24, color: Colors.orange),
+                    tooltip: 'En attente',
+                  ),
+                  ButtonSegment(
+                    value: 'confirmed',
+                    icon: Icon(Icons.check_circle, size: 24, color: Colors.green),
+                    tooltip: 'Confirmées',
+                  ),
+                  ButtonSegment(
+                    value: 'completed',
+                    icon: Icon(Icons.event_available, size: 24, color: Colors.blue),
+                    tooltip: 'Terminées',
+                  ),
+                  ButtonSegment(
+                    value: 'cancelled',
+                    icon: Icon(Icons.cancel, size: 24, color: Colors.red),
+                    tooltip: 'Annulées',
+                  ),
+                ],
+                selected: const {'pending'},
+                onSelectionChanged: (_) {},
               ),
             ),
-            Card(
-              margin: const EdgeInsets.only(bottom: 8),
-              child: ListTile(
-                leading: const Icon(Icons.restaurant, size: 40),
-                title: const Text('La Trattoria'),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.location_on, size: 14, color: Colors.grey),
-                        const SizedBox(width: 4),
-                        const Text('Bruxelles'),
-                        const SizedBox(width: 12),
-                        const Icon(Icons.star, size: 14, color: Colors.amber),
-                        const SizedBox(width: 2),
-                        Text(
-                          '4.2',
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+            const SizedBox(height: 8),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.all(16.0),
+                children: [
+                  Card(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    child: InkWell(
+                      onTap: () {},
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Row(
+                          children: [
+                            Tooltip(
+                              message: 'En attente',
+                              child: const Icon(Icons.pending, size: 32, color: Colors.orange),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Bistrot du port',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.location_on, size: 14),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        'Anvers',
+                                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.access_time, size: 16),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        'sam. 06/12/2024 à 19:00',
+                                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      const Icon(Icons.people, size: 16),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        '2 convives',
+                                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Icon(Icons.chevron_right),
+                          ],
                         ),
-                        const SizedBox(width: 12),
-                        Text(
-                          '€€',
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                        ),
-                      ],
+                      ),
                     ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        const Icon(Icons.access_time, size: 14, color: Colors.grey),
-                        const SizedBox(width: 4),
-                        Text(
-                          'Dernière réservation: jeu. 05/12/2024',
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  ),
+                  Card(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    child: InkWell(
+                      onTap: () {},
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Row(
+                          children: [
+                            Tooltip(
+                              message: 'En attente',
+                              child: const Icon(Icons.pending, size: 32, color: Colors.orange),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'La Trattoria',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.location_on, size: 14),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        'Bruxelles',
+                                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.access_time, size: 16),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        'ven. 05/12/2024 à 20:00',
+                                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      const Icon(Icons.people, size: 16),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        '4 convives',
+                                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Icon(Icons.chevron_right),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
-                    const SizedBox(height: 4),
-                    const Row(
-                      children: [
-                        Icon(Icons.pending, size: 14, color: Colors.orange),
-                        SizedBox(width: 4),
-                        Text(
-                          '1 demande en attente',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.orange,
-                            fontWeight: FontWeight.w500,
-                          ),
+                  ),
+                  Card(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    child: InkWell(
+                      onTap: () {},
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Row(
+                          children: [
+                            Tooltip(
+                              message: 'Confirmée',
+                              child: const Icon(Icons.check_circle, size: 32, color: Colors.green),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'La Table du Chef',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.location_on, size: 14),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        'Liège',
+                                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.access_time, size: 16),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        'dim. 01/12/2024 à 13:00',
+                                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      const Icon(Icons.people, size: 16),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        '4 convives',
+                                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Icon(Icons.chevron_right),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
-                  ],
-                ),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () {},
-              ),
-            ),
-            Card(
-              margin: EdgeInsets.zero,
-              child: ListTile(
-                leading: const Icon(Icons.restaurant, size: 40),
-                title: const Text('Sushi House'),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.location_on, size: 14, color: Colors.grey),
-                        const SizedBox(width: 4),
-                        const Text('Bruxelles'),
-                        const SizedBox(width: 12),
-                        const Icon(Icons.star, size: 14, color: Colors.amber),
-                        const SizedBox(width: 2),
-                        Text(
-                          '4.7',
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  ),
+                  Card(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    child: InkWell(
+                      onTap: () {},
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Row(
+                          children: [
+                            Tooltip(
+                              message: 'Terminée',
+                              child: const Icon(Icons.event_available, size: 32, color: Colors.blue),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Sushi House',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.location_on, size: 14),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        'Bruxelles',
+                                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.access_time, size: 16),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        'mar. 26/11/2024 à 19:30',
+                                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      const Icon(Icons.people, size: 16),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        '2 convives',
+                                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Icon(Icons.chevron_right),
+                          ],
                         ),
-                        const SizedBox(width: 12),
-                        Text(
-                          '€€€',
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                        ),
-                      ],
+                      ),
                     ),
-                  ],
-                ),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () {},
+                  ),
+                ],
               ),
             ),
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {},
+        icon: const Icon(Icons.add),
+        label: const Text('Nouvelle réservation'),
+      ),
     );
   }
 }
-
