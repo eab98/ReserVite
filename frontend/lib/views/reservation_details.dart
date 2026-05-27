@@ -20,6 +20,8 @@ class _ReservationDetailsScreen extends ConsumerState<ReservationDetailsScreen> 
     final asyncState = ref.watch(clientStateProvider);
     final notifier = ref.read(clientStateProvider.notifier);
 
+    final int id;
+
     final theme = Theme.of(context);
     final simulatedTime = DateTime(2024, 12, 4, 16, 0);
 
@@ -35,7 +37,7 @@ class _ReservationDetailsScreen extends ConsumerState<ReservationDetailsScreen> 
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: 'Rafraîchir les données',
-            onPressed: () => ,
+            onPressed: () => notifier.loadReservationDetails(id);
           ),
         ],
         elevation: 2,

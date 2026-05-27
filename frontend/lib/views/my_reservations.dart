@@ -115,7 +115,7 @@ class _MyReservationsScreen extends ConsumerState<MyReservationsScreen> {
             const SizedBox(height: 8),
             Expanded(
               child: asyncState.when(data: (unfilteredList) {
-                final filteredList = _filterByStatus(unfilteredList, _selectedStatus);
+                final filteredList = _filterByStatus(unfilteredList.reservations, _selectedStatus);
                 return ListView(
                     padding: const EdgeInsets.all(16.0),
                     children: filteredList.map(_buildCard).toList(),
@@ -164,7 +164,7 @@ class _MyReservationsScreen extends ConsumerState<MyReservationsScreen> {
                         const Icon(Icons.location_on, size: 14),
                         const SizedBox(width: 4),
                         Text(
-                          r.city,
+                          r.city!,
                           style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                         ),
                       ],

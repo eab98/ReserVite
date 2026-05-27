@@ -37,7 +37,7 @@ create or replace function get_reservation_details(_id int)
     begin
         perform auth.check_logged();
         return query
-        select resto.name, resa.status, resto.address, resa.datetime, resa.number_of_guests, resto.phone
+        select resa.id, resto.name, resa.status, resto.address, resa.datetime, resa.number_of_guests, resto.phone
         from reservations resa, restaurants resto
         where resa.restaurant = resto.id and resa.id = _id;
     end;
