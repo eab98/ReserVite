@@ -7,6 +7,7 @@ class Reservation {
   final int numberOfGuests;
   final String? restoPhone;
   final String? restoAddress;
+  final String? specialRequests;
 
   const Reservation({
     required this.id,
@@ -16,7 +17,9 @@ class Reservation {
     required this.dateTime,
     required this.numberOfGuests,
     this.restoAddress,
-    this.restoPhone
+    this.restoPhone,
+    this.specialRequests
+
 
   });
 
