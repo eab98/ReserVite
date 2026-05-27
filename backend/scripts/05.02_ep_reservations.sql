@@ -18,7 +18,8 @@ create or replace function get_my_reservations()
         return query
         select resa.id, resto.name, resa.status, resto.city, resa.datetime, resa.number_of_guests
         from reservations resa, restaurants resto
-        where resa.restaurant = resto.id and resa.client = auth.id();
+        where resa.restaurant = resto.id and resa.client = auth.id()
+        order by resa.datetime DESC ;
     end;
     $$language plpgsql security definer;;
 
