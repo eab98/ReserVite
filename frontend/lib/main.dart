@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:prbd_2526_a03/core/tools/params.dart';
-
+import 'package:prbd_2526_a03/views/find_restaurants.dart';
 import 'package:prbd_2526_a03/views/login.dart';
 import 'package:prbd_2526_a03/views/my_reservations.dart';
 import 'package:prbd_2526_a03/views/signup.dart';
@@ -22,7 +22,8 @@ void main() async {
       routes: {
         '/login' :(context) => const LoginScreen(),
         '/signup' : (context) => const SignupScreen(),
-        '/home' : (context) => const MyReservationsScreen()
+        '/home' : (context) => const MyReservationsScreen(),
+        '/find_restaurants' : (context) => const FindRestaurantsScreen()
       }
     ),
   )

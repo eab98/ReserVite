@@ -37,7 +37,7 @@ class _MyReservationsScreen extends ConsumerState<MyReservationsScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
-            onPressed: () {},
+            onPressed: () => Navigator.pushNamed(context, '/find_restaurants'),
           ),
           IconButton(
             icon: const Icon(Icons.refresh),
