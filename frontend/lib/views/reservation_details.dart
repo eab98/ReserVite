@@ -28,7 +28,8 @@ class _ReservationDetailsScreen extends ConsumerState<ReservationDetailsScreen> 
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () {},
+          //les vues sont superposées en un stack donc faire un pop revele la vue d'avant ici my_reservations
+          onPressed: () => Navigator.pop(context),
         ),
         title: const Text('Détails de la réservation'),
         automaticallyImplyLeading: false,
@@ -110,7 +111,7 @@ class _ReservationDetailsScreen extends ConsumerState<ReservationDetailsScreen> 
                                    SizedBox(width: 4),
                                   Expanded(
                                     child: Text(
-                                      r.restoAddress!,
+                                      '${r.restoAddress!},${r.city}',
                                       style: TextStyle(color: Colors.grey[600]),
                                     ),
                                   ),
@@ -135,7 +136,7 @@ class _ReservationDetailsScreen extends ConsumerState<ReservationDetailsScreen> 
                                   const Icon(Icons.calendar_today, size: 20),
                                   const SizedBox(width: 8),
                                   Text(
-                                    'Date: ${r.dateTime.day}/${r.dateTime.month}${r.dateTime.year}'
+                                    'Date: ${DateFormat('EEE dd/MM/yyyy', 'fr_FR').format(r.dateTime)} '
                                   ),
                                 ],
                               ),
@@ -144,8 +145,7 @@ class _ReservationDetailsScreen extends ConsumerState<ReservationDetailsScreen> 
                                 children: [
                                   const Icon(Icons.access_time, size: 20),
                                   const SizedBox(width: 8),
-                                   Text('Heure: ${r.dateTime.hour}'),
-                                ],
+                                  Text('Heure: ${DateFormat('HH:mm').format(r.dateTime)}'),                                ],
                               ),
                               const SizedBox(height: 8),
                               Row(
@@ -176,7 +176,7 @@ class _ReservationDetailsScreen extends ConsumerState<ReservationDetailsScreen> 
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                'Anniversaire de mariage',
+                                r.specialRequests ?? 'Aucune demande',
                                 style: TextStyle(color: Colors.grey[700]),
                               ),
                             ],

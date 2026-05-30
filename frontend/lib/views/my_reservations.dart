@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 import 'package:prbd_2526_a03/models/reservation.dart';
 import 'package:prbd_2526_a03/views/reservation_details.dart';
 
@@ -183,7 +184,7 @@ class _MyReservationsScreen extends ConsumerState<MyReservationsScreen> {
                         const Icon(Icons.access_time, size: 16),
                         const SizedBox(width: 4),
                         Text(
-                          r.dateTime.toString(),
+                            '${DateFormat('EEE dd/MM/yyyy', 'fr_FR').format(r.dateTime)} à ${DateFormat('HH:mm').format(r.dateTime)}',
                           style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                         ),
                         const SizedBox(width: 12),

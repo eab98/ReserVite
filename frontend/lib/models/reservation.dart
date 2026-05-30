@@ -33,6 +33,7 @@ class Reservation {
         numberOfGuests: json['number_of_guests'],
         restoAddress : json['address'],
         restoPhone : json['phone'],
+      specialRequests: json['special_request']
     );
   }
 
