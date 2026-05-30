@@ -25,14 +25,19 @@ create or replace function get_my_reservations()
 
 grant execute on function get_my_reservations() to authenticated;
 
+-- drop function get_reservation_details(_id int);
+
 create or replace function get_reservation_details(_id int)
        returns table
-       (name varchar,
+       (
+       id int,
+       name varchar,
        status status_type,
        address varchar,
        datetime timestamp,
        number_of_guests int,
-       phone varchar) as
+       phone varchar,
+       special_request text) as
     $$
     begin
         perform auth.check_logged();
