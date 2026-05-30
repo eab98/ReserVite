@@ -5,7 +5,7 @@ import 'package:prbd_2526_a03/models/restaurant.dart';
 
 class FindRestaurantService {
 
-  static Future<List<Restaurant>> get_matching_restaurants(String filter) async {
+  Future<List<Restaurant>> getMatchingRestaurants(String filter) async {
     final response = await ApiClient.post(
         'get_matching_restaurants',
         body: json.encode({'filter': filter}),
