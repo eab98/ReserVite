@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:prbd_2526_a03/core/tools/constants.dart';
+import 'package:prbd_2526_a03/providers/client_state_provider.dart';
 import 'package:prbd_2526_a03/providers/restaurant_provider.dart';
 
 import '../../core/services/find_restaurant_service.dart';
@@ -19,7 +20,8 @@ class FindRestaurantsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(restaurantProvider);
+    final state = ref.watch(clientStateProvider);
+    final notifier = ref.read(clientStateProvider.notifier);
     final theme = Theme.of(context);
     final simulatedTime = DateTime(2024, 12, 4, 16, 0);
 
@@ -78,11 +80,7 @@ class FindRestaurantsScreen extends ConsumerWidget {
                   prefixIcon: Icon(Icons.search),
                   border: OutlineInputBorder(),
                 ),
-                onChanged: (value) {
-                  ref
-                      .read(restaurantProvider.notifier)
-                      .onSearchChanged(value);
-                },
+                onChanged: (value) => notifier.refreshRestaurants(value),
               ),
             ),
             Expanded(
@@ -120,15 +118,15 @@ class FindRestaurantsScreen extends ConsumerWidget {
                     child: ListView.builder(
                       padding: const EdgeInsets.all(16),
 
-                      itemCount: state.restaurants.length >
+                      itemCount: state.value!.restaurants.length >
                           Constants.maxRestaurants
                           ? Constants.maxRestaurants
-                          : state.restaurants.length,
+                          : state.value!.restaurants.length,
 
                       itemBuilder: (context, index) {
                         return RestaurantCard(
                           restaurant:
-                          state.restaurants[index],
+                          state.value!.restaurants[index],
                         );
                       },
                     ),

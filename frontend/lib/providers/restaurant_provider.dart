@@ -3,9 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prbd_2526_a03/core/services/find_restaurant_service.dart';
 import 'package:prbd_2526_a03/models/restaurant.dart';
 
-final FindRestaurantService service = FindRestaurantService();
-
-
 class RestaurantState {
   final List<Restaurant> restaurants;
   final String filter;
@@ -62,7 +59,7 @@ class RestaurantProvider extends Notifier<RestaurantState> {
     );
 
     final restaurants =
-    await service.getMatchingRestaurants(
+    await FindRestaurantService.getMatchingRestaurants(
       state.filter.trim(),
     );
 
