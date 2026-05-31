@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:prbd_2526_a03/models/reservation.dart';
 
-import '../providers/client_state_provider.dart';
-import '../providers/current_user_provider.dart';
+import '../../providers/client_state_provider.dart';
+import '../../providers/current_user_provider.dart';
 
 class MyReservationsScreen extends ConsumerStatefulWidget {
   const MyReservationsScreen({super.key});
