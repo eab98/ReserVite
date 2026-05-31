@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 import 'package:prbd_2526_a03/models/reservation.dart';
+import 'package:prbd_2526_a03/views/reservation_details.dart';
 
 import '../../providers/client_state_provider.dart';
 import '../../providers/current_user_provider.dart';
@@ -115,7 +117,7 @@ class _MyReservationsScreen extends ConsumerState<MyReservationsScreen> {
             const SizedBox(height: 8),
             Expanded(
               child: asyncState.when(data: (unfilteredList) {
-                final filteredList = _filterByStatus(unfilteredList, _selectedStatus);
+                final filteredList = _filterByStatus(unfilteredList.reservations, _selectedStatus);
                 return ListView(
                     padding: const EdgeInsets.all(16.0),
                     children: filteredList.map(_buildCard).toList(),
@@ -140,7 +142,14 @@ class _MyReservationsScreen extends ConsumerState<MyReservationsScreen> {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       child: InkWell(
-        onTap: () {},
+        onTap: () {
+          ref.read(clientStateProvider.notifier).loadReservationDetails(r.id);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+            builder: (_) => ReservationDetailsScreen(id: r.id),
+          ),);
+        },
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Row(
@@ -164,7 +173,7 @@ class _MyReservationsScreen extends ConsumerState<MyReservationsScreen> {
                         const Icon(Icons.location_on, size: 14),
                         const SizedBox(width: 4),
                         Text(
-                          r.city,
+                          r.city!,
                           style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                         ),
                       ],
@@ -175,7 +184,7 @@ class _MyReservationsScreen extends ConsumerState<MyReservationsScreen> {
                         const Icon(Icons.access_time, size: 16),
                         const SizedBox(width: 4),
                         Text(
-                          r.dateTime.toString(),
+                            '${DateFormat('EEE dd/MM/yyyy', 'fr_FR').format(r.dateTime)} à ${DateFormat('HH:mm').format(r.dateTime)}',
                           style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                         ),
                         const SizedBox(width: 12),
