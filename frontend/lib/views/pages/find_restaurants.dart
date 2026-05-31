@@ -27,7 +27,9 @@ class FindRestaurantsScreen extends ConsumerWidget {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
         title: const Text('Rechercher un restaurant'),
         automaticallyImplyLeading: false,
