@@ -49,6 +49,8 @@ class ClientStateNotifier extends AsyncNotifier<ClientState>{
     }
   }
 
+  Restaurant? currentRestaurant;
+
 
   List<Restaurant> getRestaurants() {
     return state.value!.restaurants;

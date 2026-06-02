@@ -1,19 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:prbd_2526_a03/core/tools/constants.dart';
 import 'package:prbd_2526_a03/providers/client_state_provider.dart';
-import 'package:prbd_2526_a03/providers/restaurant_provider.dart';
-
-import '../../core/services/find_restaurant_service.dart';
-import '../../models/restaurant.dart';
 import '../widgets/restaurant_card.dart';
 
-final restaurantProvider =
-NotifierProvider<RestaurantProvider, RestaurantState>(
-  RestaurantProvider.new,
-);
 
 class FindRestaurantsScreen extends ConsumerWidget {
   const FindRestaurantsScreen({super.key});
@@ -39,7 +30,9 @@ class FindRestaurantsScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: 'Rafraîchir les données',
-            onPressed: () {},
+            onPressed: () {
+              notifier.refresh();
+            },
           ),
         ],
         elevation: 2,

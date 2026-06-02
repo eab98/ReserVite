@@ -1,9 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../models/restaurant.dart';
+import '../../providers/client_state_provider.dart';
 
-class RestaurantCard extends StatelessWidget {
+class RestaurantCard extends ConsumerWidget {
   final Restaurant restaurant;
 
   const RestaurantCard({
@@ -12,7 +13,9 @@ class RestaurantCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(clientStateProvider);
+    final notifier = ref.read(clientStateProvider.notifier);
     String currency_logo = '';
     if (restaurant.priceRange != null) {
       currency_logo =
@@ -65,7 +68,10 @@ class RestaurantCard extends StatelessWidget {
           ],
         ),
         trailing: const Icon(Icons.chevron_right),
-        onTap: () {},
+        onTap: () {
+          notifier.currentRestaurant = restaurant;
+          Navigator.pushNamed(context, '/restaurant_details');
+        },
       ),
     );
   }
