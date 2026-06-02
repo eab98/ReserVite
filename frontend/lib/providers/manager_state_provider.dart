@@ -32,17 +32,24 @@ AsyncNotifierProvider<ManagerStateNotifier, ManagerState>(
 class ManagerStateNotifier extends AsyncNotifier<ManagerState> {
   @override
   Future<ManagerState> build() async {
-    final token = await ref.watch(currentUserProvider.future);
+    final user =
+    await ref.watch(currentUserProvider.future);
 
-    if (token == null) {
+    if (user == null) {
       return const ManagerState();
+    }
+
+    if (!user.isManager) {
+      throw Exception(
+        'Access denied: manager role required',
+      );
     }
 
     final restaurants =
     await RestaurantServices.getMyRestaurants();
 
     return ManagerState(
-      restaurants: restaurants,
+      restaurants: restaurants
     );
   }
 

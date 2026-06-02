@@ -1,26 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:prbd_2526_a03/providers/manager_state_provider.dart';
 
-void main() async {
-  await initializeDateFormatting('fr_FR', null);
-  runApp(
-    MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
-      home: const MyRestaurantsScreen(),
-    ),
-  );
+import '../../providers/current_user_provider.dart';
+import '../widgets/manager_restaurant_card.dart';
+
+class MyRestaurantsScreen extends ConsumerStatefulWidget {
+  const MyRestaurantsScreen({super.key});
+
+
+  @override
+  ConsumerState<MyRestaurantsScreen> createState() => _MyRestaurantsScreen();
 }
 
-class MyRestaurantsScreen extends StatelessWidget {
-  const MyRestaurantsScreen({super.key});
+class _MyRestaurantsScreen extends ConsumerState<MyRestaurantsScreen> {
+
+  Future<void> _logout(BuildContext context) async{
+    await ref.read(currentUserProvider.notifier).logout();
+    if(!context.mounted) return;
+    Navigator.pushReplacementNamed(context, '/login');
+  }
 
   @override
   Widget build(BuildContext context) {
+    final state = ref.watch(managerStateProvider);
+    final notifier = ref.read(managerStateProvider.notifier);
     final theme = Theme.of(context);
     final simulatedTime = DateTime(2024, 12, 4, 16, 0);
 
@@ -32,12 +38,12 @@ class MyRestaurantsScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: 'Rafraîchir les données',
-            onPressed: () {},
+            onPressed: () => notifier.refreshRestaurants(),
           ),
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Déconnexion (Benoît P.)',
-            onPressed: () {},
+            onPressed: () => _logout(context),
           ),
         ],
         elevation: 2,
@@ -67,161 +73,26 @@ class MyRestaurantsScreen extends StatelessWidget {
         ),
       ),
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(16.0),
-          children: [
-            Card(
-              margin: const EdgeInsets.only(bottom: 8),
-              child: ListTile(
-                leading: const Icon(Icons.restaurant, size: 40),
-                title: const Text('Le Gourmet'),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.location_on, size: 14, color: Colors.grey),
-                        const SizedBox(width: 4),
-                        const Text('Bruxelles'),
-                        const SizedBox(width: 12),
-                        const Icon(Icons.star, size: 14, color: Colors.amber),
-                        const SizedBox(width: 2),
-                        Text(
-                          '4.5',
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                        ),
-                        const SizedBox(width: 12),
-                        Text(
-                          '€€€',
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        const Icon(Icons.access_time, size: 14, color: Colors.grey),
-                        const SizedBox(width: 4),
-                        Text(
-                          'Dernière réservation: mer. 04/12/2024',
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    const Row(
-                      children: [
-                        Icon(Icons.pending, size: 14, color: Colors.orange),
-                        SizedBox(width: 4),
-                        Text(
-                          '2 demandes en attente',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.orange,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () {},
-              ),
-            ),
-            Card(
-              margin: const EdgeInsets.only(bottom: 8),
-              child: ListTile(
-                leading: const Icon(Icons.restaurant, size: 40),
-                title: const Text('La Trattoria'),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.location_on, size: 14, color: Colors.grey),
-                        const SizedBox(width: 4),
-                        const Text('Bruxelles'),
-                        const SizedBox(width: 12),
-                        const Icon(Icons.star, size: 14, color: Colors.amber),
-                        const SizedBox(width: 2),
-                        Text(
-                          '4.2',
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                        ),
-                        const SizedBox(width: 12),
-                        Text(
-                          '€€',
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        const Icon(Icons.access_time, size: 14, color: Colors.grey),
-                        const SizedBox(width: 4),
-                        Text(
-                          'Dernière réservation: jeu. 05/12/2024',
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    const Row(
-                      children: [
-                        Icon(Icons.pending, size: 14, color: Colors.orange),
-                        SizedBox(width: 4),
-                        Text(
-                          '1 demande en attente',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.orange,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () {},
-              ),
-            ),
-            Card(
-              margin: EdgeInsets.zero,
-              child: ListTile(
-                leading: const Icon(Icons.restaurant, size: 40),
-                title: const Text('Sushi House'),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.location_on, size: 14, color: Colors.grey),
-                        const SizedBox(width: 4),
-                        const Text('Bruxelles'),
-                        const SizedBox(width: 12),
-                        const Icon(Icons.star, size: 14, color: Colors.amber),
-                        const SizedBox(width: 2),
-                        Text(
-                          '4.7',
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                        ),
-                        const SizedBox(width: 12),
-                        Text(
-                          '€€€',
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () {},
-              ),
-            ),
-          ],
+        child: state.when(
+          loading: () => const Center(
+            child: CircularProgressIndicator(),
+          ),
+
+          error: (error, stackTrace) => Center(
+            child: Text(error.toString()),
+          ),
+
+          data: (managerState) {
+            return ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: managerState.restaurants.length,
+              itemBuilder: (context, index) {
+                return ManagerRestaurantCard(
+                  restaurant: managerState.restaurants[index],
+                );
+              },
+            );
+          },
         ),
       ),
     );

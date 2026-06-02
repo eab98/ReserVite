@@ -46,7 +46,7 @@ $$
     end;
 $$ language plpgsql security definer;
 
-grant execute on function get_my_restaurants(manager_id int) to manager;
+grant execute on function get_my_restaurants() to manager;
 
 
 
