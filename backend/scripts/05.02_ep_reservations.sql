@@ -193,7 +193,7 @@ returns no_slots_reason as
     begin
         perform auth.check_logged();
 
-        if(check_restaurant_closed(_restaurant, _date)) then
+        if(check_restaurant_closed(_restaurant, _date::date)) then
             return 'closed';
         end if;
 
@@ -244,3 +244,8 @@ grant execute on function get_specific_error_if_no_slots(int, timestamp) to auth
 --
 --     end;
 --     $$language plpgsql security definer ;
+
+select auth.login_for_test('brlacroix@epfc.eu');
+select * from get_available_slots_for_date(3, '2024-12-09', 2);
+select get_specific_error_if_no_slots(3, '2024-12-09');
+select auth.logout_for_test();
