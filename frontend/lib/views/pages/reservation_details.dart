@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 
-import '../providers/client_state_provider.dart';
+import '../../providers/client_state_provider.dart';
 
 class ReservationDetailsScreen extends ConsumerStatefulWidget {
   final int id;

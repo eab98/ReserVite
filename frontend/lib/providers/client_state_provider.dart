@@ -1,22 +1,37 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart';
+import 'package:prbd_2526_a03/core/services/find_restaurant_service.dart';
 import 'package:prbd_2526_a03/core/services/reservation_services.dart';
 import 'package:prbd_2526_a03/models/reservation.dart';
+import 'package:prbd_2526_a03/models/restaurant.dart';
+import 'package:prbd_2526_a03/models/services.dart';
 import 'package:prbd_2526_a03/providers/current_user_provider.dart';
 
 class ClientState {
   final List<Reservation> reservations;
   final AsyncValue<Reservation>? currentReservationDetails;
+  final List<Restaurant> restaurants;
+  final Restaurant? currentRestaurant;
+  final List<Services>? currentRestaurantServices;
 
-  ClientState({required this.reservations, this.currentReservationDetails});
+  ClientState({required this.reservations, this.currentReservationDetails, required this.restaurants,
+    this.currentRestaurantServices, this.currentRestaurant});
 
   ClientState copyWith({
      final List<Reservation>? reservations,
-    final AsyncValue<Reservation>? currentReservationDetails
+    final AsyncValue<Reservation>? currentReservationDetails,
+    final List<Restaurant>? restaurants,
+    final List<Services>? currentRestaurantServices,
+    final Restaurant? currentRestaurant
   })
   {
     return ClientState(reservations: reservations ?? this.reservations,
-                            currentReservationDetails: currentReservationDetails ?? this.currentReservationDetails);
+                            currentReservationDetails: currentReservationDetails ?? this.currentReservationDetails,
+                            restaurants: restaurants ?? this.restaurants,
+                            currentRestaurantServices: currentRestaurantServices ?? this.currentRestaurantServices,
+                            currentRestaurant: currentRestaurant ?? this.currentRestaurant);
 
   }
 }
@@ -29,16 +44,82 @@ class ClientStateNotifier extends AsyncNotifier<ClientState>{
   Future<ClientState> build() async {
     ref.watch(currentUserProvider);
     final list = await ReservationServices.getMyReservations();
-    return ClientState(reservations: list);
+    final restList = await FindRestaurantService.getMatchingRestaurants("");
+    return ClientState(reservations: list, restaurants: restList);
   }
 
   Future<void> refresh() async{
     state = const AsyncLoading();
     try {
       final data = await ReservationServices.getMyReservations();
-      state = AsyncData(ClientState(reservations: data));
+      state = AsyncData(state.value!.copyWith(reservations: data));
     } catch (e) {
       state = AsyncError(e, StackTrace.current);
+    }
+  }
+
+
+  List<Restaurant> getRestaurants() {
+    return state.value!.restaurants;
+  }
+
+  Restaurant getCurrentRestaurant() {
+    return state.value!.currentRestaurant!;
+  }
+
+  List<Services>? getCurrentServices() {
+    return state.value!.currentRestaurantServices;
+  }
+
+  Future<void> refreshRestaurants(String filter) async {
+    state = AsyncData(
+      state.value!.copyWith(
+        restaurants: getRestaurants(),
+      ),
+    );
+    try {
+      final data = await FindRestaurantService.getMatchingRestaurants(filter);
+      state = AsyncData(state.value!.copyWith(restaurants: data));
+    } catch (e) {
+      state = AsyncError(e, StackTrace.current);
+    }
+  }
+
+
+  Future<void> selectRestaurant(Restaurant restaurant) async {
+    final previous = state.value;
+
+    if (previous == null) return;
+
+    state = AsyncData(
+      previous.copyWith(
+        currentRestaurant: restaurant,
+        currentRestaurantServices: const [],
+      ),
+    );
+
+    await refreshServices(restaurant.id);
+  }
+
+
+  Future<void> refreshServices(int restaurantId) async {
+    final previous = state.value;
+
+    if (previous == null) return;
+
+    try {
+      final data =
+      await FindRestaurantService.getServices(restaurantId);
+
+      final current = state.value ?? previous;
+
+      state = AsyncData(
+        current.copyWith(
+          currentRestaurantServices: data,
+        ),
+      );
+    } catch (e, st) {
+      state = AsyncError(e, st);
     }
   }
 
