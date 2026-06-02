@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:prbd_2526_a03/core/services/reservation_services.dart';
 import 'package:prbd_2526_a03/models/no_slots_reason.dart';
 
 import '../../providers/client_state_provider.dart';
@@ -19,6 +20,7 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
   int numberOfGuests = 2;
   String? specialRequest;
   DateTime? selectedSlot;
+  bool? canFitTable;
 
   @override
   void initState() {
@@ -189,19 +191,23 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
                             children: (clientState.availableSlots ?? [])
                                 .map((slot) =>
                                 InkWell(
-                                  onTap: () =>
-                                      setState(() => selectedSlot = slot),
+                                  onTap: () async {
+                                  setState(() => selectedSlot = slot);
+                                  final check =
+                                  await ReservationServices.checkCapacity(clientState.currentRestaurant!.id, numberOfGuests, slot);
+                                  print('CAPACITY check for $slot, $numberOfGuests guests = $check');
+                                  setState(()=>canFitTable = check);
+                                  },
                                   borderRadius: BorderRadius.circular(16),
                                   child: _slotCard(slot, theme),
-                                )
+                                  )
                             ).toList(),
 
                           )
                         ],
                     const SizedBox(height: 24),
-                    if ((clientState.availableSlots?.isEmpty ?? false) &&
-                        clientState.noSlotsError == NoSlotsReason.noCapacity)
-                      _warningBox(clientState.noSlotsError!),
+                    if (selectedSlot != null && canFitTable == false)
+                      _warningBox(NoSlotsReason.noCapacity),
                     ListTile(
                       leading: const Icon(Icons.people),
                       title: const Text('Nombre de convives'),
@@ -213,7 +219,11 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
                             icon: const Icon(Icons.remove),
                             //setState force le reload de la page
                             onPressed: numberOfGuests > 1
-                                ? () => setState(() => numberOfGuests--)
+                                ? () => setState(()
+                            {numberOfGuests--;
+                              selectedSlot=null;
+                              canFitTable = null;
+                            })
                                 : null,
                           ),
                           IconButton(
@@ -304,6 +314,7 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
       setState(() {
         selectedDate = selected;
         selectedSlot = null;
+        canFitTable = null;
       });
 
       ref.read(clientStateProvider.notifier).loadSlotsPerDay(
@@ -327,6 +338,7 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
     setState(() {
       selectedDate = newDate;
       selectedSlot = null;
+      canFitTable = null;
     });
     ref.read(clientStateProvider.notifier)
         .loadSlotsPerDay(restaurant.id, newDate, numberOfGuests);

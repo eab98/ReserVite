@@ -124,6 +124,7 @@ create or replace function check_capacity(_restaurant int, _number_of_guests int
         );
     end;
     $$language plpgsql security definer;
+grant execute on function check_capacity(int, int, timestamp) to authenticated;
 
 --on regarde si un certain slot est disponible pour cette date la pour ce nombre de guests
 create or replace function check_slot_available(_restaurant int, _date timestamp, _number_of_guests int)
@@ -142,9 +143,9 @@ create or replace function check_slot_available(_restaurant int, _date timestamp
             return false;
         end if;
 
-        if not (check_capacity(_restaurant, _number_of_guests, _date)) then
-            return false;
-        end if;
+--         if not (check_capacity(_restaurant, _number_of_guests, _date)) then
+--             return false;
+--         end if;
 
         return true;
     end;

@@ -74,4 +74,17 @@ class ReservationServices {
       default: throw Exception('Unknown no_slots_reason: $value');
     }
   }
+
+  static Future<bool> checkCapacity(int restoId, int numberOfGuests, DateTime slot) async {
+    final response = await ApiClient.post(
+      'check_capacity',
+      body : json.encode({'_restaurant' : restoId, '_number_of_guests' : numberOfGuests, '_date' : slot.toIso8601String()})
+    );
+    if(response.statusCode != 200){
+      throw Exception('Failed to check capacity');
+    }
+
+    final dynamic body = json.decode(response.body);
+    return body is bool ? body : body.first.values.first as bool;
+  }
 }
