@@ -246,7 +246,37 @@ grant execute on function get_specific_error_if_no_slots(int, timestamp) to auth
 --     end;
 --     $$language plpgsql security definer ;
 
-select auth.login_for_test('brlacroix@epfc.eu');
-select * from get_available_slots_for_date(3, '2024-12-09', 2);
-select get_specific_error_if_no_slots(3, '2024-12-09');
-select auth.logout_for_test();
+
+create or replace function save_reservation(
+    _restaurant int,
+    _date timestamp,
+    _number_of_guests int,
+    _status text,
+    _id int default null,
+    _special_request text default null) returns int as
+    $$
+    declare
+        _new_id int;
+        _client int;
+    begin
+        perform auth.check_logged();
+        _client := auth.id();
+
+        if(_id is null) then
+            insert into reservations (client, restaurant, datetime, number_of_guests, status,special_requests)
+            values (_client, _restaurant, _date, _number_of_guests, _status, _special_request)
+            returning id into _new_id;
+            return _new_id;
+        else
+            update reservations set client = _client,
+                                    restaurant=_restaurant,
+                                    datetime = _date,
+                                    number_of_guests = _number_of_guests,
+                                    status = _status,
+                                    special_requests = _special_request
+            where reservations.id = _id;
+            return _id;
+        end if;
+        end ;
+    $$language plpgsql security definer ;
+grant execute on function save_reservation to authenticated;

@@ -87,4 +87,25 @@ class ReservationServices {
     final dynamic body = json.decode(response.body);
     return body is bool ? body : body.first.values.first as bool;
   }
+
+  static Future<int> saveReservation(int? resaId, int restoId, DateTime date, int numberOfGuests, String status, String? specialRequest) async {
+    final response = await ApiClient.post(
+      'save_reservation',
+      body : json.encode({
+        '_id' : resaId,
+        '_restaurant' : restoId,
+        '_date' : date.toIso8601String(),
+        '_number_of_guests' : numberOfGuests,
+        '_status' : status,
+        '_special_request' : specialRequest })
+    );
+
+    if(response.statusCode != 200){
+      throw Exception('Failed to save reservation');
+    }
+
+    final dynamic body = json.decode(response.body);
+    return body is int ? body : body.first.values.first as int;;
+
+  }
 }
