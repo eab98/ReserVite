@@ -22,6 +22,14 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
   DateTime? selectedSlot;
   bool? canFitTable;
 
+  final _specialRequestController = TextEditingController();
+
+  @override
+  void dispose() {
+    _specialRequestController.dispose();
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -195,7 +203,6 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
                                   setState(() => selectedSlot = slot);
                                   final check =
                                   await ReservationServices.checkCapacity(clientState.currentRestaurant!.id, numberOfGuests, slot);
-                                  print('CAPACITY check for $slot, $numberOfGuests guests = $check');
                                   setState(()=>canFitTable = check);
                                   },
                                   borderRadius: BorderRadius.circular(16),
@@ -236,12 +243,20 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
+                      controller: _specialRequestController,
                       decoration: const InputDecoration(
                         labelText: 'Demandes spéciales (optionnel)',
                         border: OutlineInputBorder(),
                         hintText: 'Allergies, préférences...',
                       ),
                       maxLines: 3,
+                      validator: (value) {
+                        //si on ne vérifie pas le empty le length vaut 0 et cela déclenche l'erreur
+                        if(value!=null && value.isNotEmpty && value.length<10){
+                          return "Les demandes spéciales doivent contenir au moins 10 caractères";
+                        }
+                        return null;
+                      },
                     ),
                     const SizedBox(height: 32),
                     ElevatedButton.icon(
