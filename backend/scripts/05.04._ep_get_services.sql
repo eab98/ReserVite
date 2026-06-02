@@ -7,6 +7,7 @@ set search_path to public;
  create or replace function get_services(restaurant_id int)
  returns table (
      id INTEGER,
+     restaurant INTEGER,
      day_of_week INTEGER,
      start_time TIME,
      end_time TIME )
