@@ -105,7 +105,7 @@ class ReservationServices {
     }
 
     final dynamic body = json.decode(response.body);
-    return body is int ? body : body.first.values.first as int;;
+    return body is int ? body : body.first.values.first as int;
 
   }
 }

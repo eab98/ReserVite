@@ -264,7 +264,7 @@ create or replace function save_reservation(
 
         if(_id is null) then
             insert into reservations (client, restaurant, datetime, number_of_guests, status,special_requests)
-            values (_client, _restaurant, _date, _number_of_guests, _status, _special_request)
+            values (_client, _restaurant, _date, _number_of_guests, _status::status_type, _special_request)
             returning id into _new_id;
             return _new_id;
         else
@@ -280,3 +280,7 @@ create or replace function save_reservation(
         end ;
     $$language plpgsql security definer ;
 grant execute on function save_reservation to authenticated;
+
+select auth.login_for_test('brlacroix@epfc.eu');
+select save_reservation(3, '2024-12-04 19:00:00', 2, 'pending');
+select auth.logout_for_test();

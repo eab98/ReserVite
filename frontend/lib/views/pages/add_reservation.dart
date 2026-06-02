@@ -260,7 +260,9 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
                     ),
                     const SizedBox(height: 32),
                     ElevatedButton.icon(
-                      onPressed: () {},
+                      onPressed: (selectedSlot != null && canFitTable == true)
+                          ? () => _createReservation(clientState)
+                           : null,
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
@@ -398,5 +400,32 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
             ],
           )
     );
+  }
+
+  Future<void> _createReservation(ClientState clientState) async {
+    final restaurant = clientState.currentRestaurant?.id;
+    if(restaurant==null || selectedSlot==null) return;
+
+    final text = _specialRequestController.text.trim();
+    final request = text.isEmpty ? null : text;
+
+    try {
+      await ReservationServices.saveReservation(null, restaurant, selectedSlot!, numberOfGuests, 'pending', request);
+
+      //si jamais on quitte la fenêtre alors que la methode n est pas terminée, on arrête le processus
+
+      if(!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Réservation créée avec succès'), backgroundColor: Colors.green),
+      );
+
+      ref.read(clientStateProvider.notifier).refresh();
+      Navigator.pushReplacementNamed(context, '/home');
+    } catch (e) {
+      if(!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erreur: $e'), backgroundColor: Colors.red,),
+      );
+    }
   }
 }
