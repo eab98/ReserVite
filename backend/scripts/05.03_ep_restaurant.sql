@@ -27,7 +27,7 @@ $$ language plpgsql security definer;
 
 grant execute on function get_matching_restaurants(filter varchar) to authenticated;
 
-create or replace function get_my_restaurants(manager_id int)
+create or replace function get_my_restaurants()
     returns table
         (id int,
          name varchar,
@@ -40,10 +40,13 @@ create or replace function get_my_restaurants(manager_id int)
          slot_duration int) as
 $$
     begin
+        perform auth.check_logged();
         return query
-        select * from restaurants where restaurants.id in (select rm.restaurant from restaurant_managers rm where rm.manager = manager_id)
+        select * from restaurants where restaurants.id in (select rm.restaurant from restaurant_managers rm where rm.manager = auth.id());
     end;
 $$ language plpgsql security definer;
+
+grant execute on function get_my_restaurants(manager_id int) to manager;
 
 
 

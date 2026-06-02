@@ -1,7 +1,55 @@
 
+import 'dart:convert';
+
 import 'package:prbd_2526_a03/core/services/security.dart';
 
 class User {
+  final String token;
+  final int id;
+  final String email;
+  final String name;
+  final String role;
+
+  const User({
+    required this.token,
+    required this.id,
+    required this.email,
+    required this.name,
+    required this.role,
+  });
+
+  bool get isClient => role == 'client';
+  bool get isManager => role == 'manager';
+
+  static User fromToken(String token) {
+    final parts = token.split('.');
+
+    if (parts.length != 3) {
+      throw Exception('Invalid token');
+    }
+
+    final payload = parts[1];
+
+    final normalizedPayload =
+    base64Url.normalize(payload);
+
+    final decodedPayload =
+    utf8.decode(
+      base64Url.decode(normalizedPayload),
+    );
+
+    final jsonPayload =
+    json.decode(decodedPayload)
+    as Map<String, dynamic>;
+
+    return User(
+      token: token,
+      id: int.parse(jsonPayload['user_id'].toString()),
+      email: jsonPayload['sub'],
+      name: jsonPayload['name'],
+      role: jsonPayload['role'],
+    );
+  }
 
   static final RegExp _emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
   static final RegExp _digitRegex = RegExp(r'\d');
