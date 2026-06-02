@@ -158,13 +158,16 @@ class ClientStateNotifier extends AsyncNotifier<ClientState>{
     //prendre l'état précédent et en faire une copie avec seulement ces attributs là qui ont changé
     state = AsyncLoading();
 
-    DateTime day = DateTime(
-        DateTime.now().year, DateTime.now().month, DateTime.now().day);
-    const maxDays = 30;
+    DateTime day = DateTime(2024, 12, 4);
+
+    // DateTime(
+    //     DateTime.now().year, DateTime.now().month, DateTime.now().day);
+     const maxDays = 30;
 
     try {
       for(int i = 0; i < maxDays; i++){
         final slots = await ReservationServices.getAvailableSlotsForDate(restaurantId, day, numberOfGuests);
+        print('day=$day slots=${slots.length}');
         if(slots.isNotEmpty) {
           state = AsyncData(previous.copyWith(
             availableSlots: slots,

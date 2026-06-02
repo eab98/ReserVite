@@ -138,7 +138,7 @@ create or replace function check_slot_available(_restaurant int, _date timestamp
             return false;
         end if;
 
-        if not (check_existing_reservation_for_service(_restaurant, _date)) then
+        if (check_existing_reservation_for_service(_restaurant, _date)) then
             return false;
         end if;
 
@@ -177,7 +177,7 @@ returns table(slot_datetime timestamp) as
             from services s
             where s.restaurant=_restaurant and s.day_of_week = extract(isodow from _date)::int
             ) slot_candidates
-        where check_slot_available(_restaurant, slot_candidate, _number_of_guests);
+            where check_slot_available(_restaurant, slot_candidate, _number_of_guests);
 
     end;
     $$language plpgsql security definer ;
@@ -244,10 +244,3 @@ grant execute on function get_specific_error_if_no_slots(int, timestamp) to auth
 --
 --     end;
 --     $$language plpgsql security definer ;
-
-
-
-select auth.login_for_test('brlacroix@epfc.eu');
-select check_slot_available(3, '2024-12-04 19:30:00', 2);   -- expect true
-select check_slot_available(3, '2024-12-02 19:30:00', 2);   -- expect false (Monday)
-select auth.logout_for_test();

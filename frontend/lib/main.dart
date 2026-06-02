@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:prbd_2526_a03/core/tools/params.dart';
+import 'package:prbd_2526_a03/views/pages/add_reservation.dart';
 import 'package:prbd_2526_a03/views/pages/find_restaurants.dart';
 import 'package:prbd_2526_a03/views/pages/login.dart';
 import 'package:prbd_2526_a03/views/pages/my_reservations.dart';
@@ -26,6 +27,7 @@ void main() async {
         '/home' : (context) => const MyReservationsScreen(),
         '/find_restaurants' : (context) => const FindRestaurantsScreen(),
         '/restaurant_details': (context) => const RestaurantDetailsScreen(),
+        '/add_reservation' : (context) => const NewReservationScreen()
       }
     ),
   )

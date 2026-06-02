@@ -352,7 +352,7 @@ class RestaurantDetailsScreen extends ConsumerWidget {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
-                    onPressed: () {},
+                    onPressed: () => Navigator.pushReplacementNamed(context, '/add_reservation'),
                     icon: const Icon(Icons.add),
                     label: const Text('Réserver'),
                     style: ElevatedButton.styleFrom(
