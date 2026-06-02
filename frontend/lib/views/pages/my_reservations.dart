@@ -131,7 +131,7 @@ class _MyReservationsScreen extends ConsumerState<MyReservationsScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Navigator.pushReplacementNamed(context, '/find_restaurants'),
+        onPressed: () => Navigator.pushNamed(context, '/find_restaurants'),
         icon: const Icon(Icons.add),
         label: const Text('Nouvelle réservation'),
       ),
