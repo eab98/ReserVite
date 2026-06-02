@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:prbd_2526_a03/core/services/reservation_services.dart';
 import 'package:prbd_2526_a03/models/no_slots_reason.dart';
 
+import '../../core/tools/debounce.dart';
 import '../../providers/client_state_provider.dart';
 
 
@@ -20,17 +21,16 @@ class NewReservationScreen extends ConsumerStatefulWidget {
 class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
   DateTime? selectedDate;
   int numberOfGuests = 2;
-  String? specialRequest;
   DateTime? selectedSlot;
   bool? canFitTable;
-  Timer? _guestDebounce;
+  final _guestDebounce = Debouncer(delay: const Duration(milliseconds: 500));
 
   final _specialRequestController = TextEditingController();
 
   @override
   void dispose() {
     _specialRequestController.dispose();
-    _guestDebounce?.cancel();
+    _guestDebounce.cancel();
     super.dispose();
   }
 
@@ -53,7 +53,6 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
   @override
   Widget build(BuildContext context) {
     final asyncState = ref.watch(clientStateProvider);
-    final notifier = ref.read(clientStateProvider.notifier);
 
     final theme = Theme.of(context);
     final simulatedTime = DateTime(2024, 12, 4, 16, 0);
@@ -434,8 +433,7 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
   void _onGuestChanged(ClientState clientState, int delta) {
     setState(() => numberOfGuests += delta);
 
-    _guestDebounce?.cancel();
-    _guestDebounce = Timer(const Duration(milliseconds: 500), () async {
+    _guestDebounce(() async {
       // dès que le nb de guests change, on recheck la disponibilité
       final restaurant = clientState.currentRestaurant;
       if (restaurant == null) return;
@@ -462,4 +460,5 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
       }
     });
   }
+
 }
