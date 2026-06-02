@@ -184,7 +184,7 @@ returns table(slot_datetime timestamp) as
 grant execute on function get_available_slots_for_date(int, timestamp, int) to authenticated;
 
 --on regrde la raison spécifique pour laquelle in l'y a pas de spot disponible
-create or replace function get_specific_error_if_no_slots(_restaurant int, _date timestamp, _number_of_guests int)
+create or replace function get_specific_error_if_no_slots(_restaurant int, _date timestamp)
 returns no_slots_reason as
     $$
     declare
@@ -226,7 +226,7 @@ returns no_slots_reason as
     end;
     $$language plpgsql security definer ;
 
-grant execute on function get_specific_error_if_no_slots(int, timestamp, int) to authenticated;
+grant execute on function get_specific_error_if_no_slots(int, timestamp) to authenticated;
 
 --
 -- --on cherche le premier slot dispo qui s'affiche une fois à l'ouverture de la page

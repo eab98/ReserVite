@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:prbd_2526_a03/core/services/api_client.dart';
+import 'package:prbd_2526_a03/models/no_slots_reason.dart';
 import 'package:prbd_2526_a03/models/reservation.dart';
 
 class ReservationServices {
@@ -34,5 +35,43 @@ class ReservationServices {
     final List<dynamic> rows = body;
     return Reservation.fromJson(rows.first);
 
+  }
+
+  static Future<List<DateTime>> getAvailableSlotsForDate(int restoId, DateTime date, int numberOfGuests) async{
+    final response = await ApiClient.post(
+      'get_available_slots_for_date',
+      body : json.encode({'_restaurant' : restoId, '_date' : date.toIso8601String(), '_number_of_guests' : numberOfGuests})
+    );
+
+    if(response.statusCode != 200){
+      throw Exception('Failed to get available slots');
+    }
+    final dynamic body = json.decode(response.body);
+    final List<dynamic> rows = body;
+    return rows.map((row) => DateTime.parse(row['slot_datetime'])).toList();
+  }
+
+  static Future<NoSlotsReason> getSpecificErrorIfNoSlots(int restoId, DateTime date) async {
+    final response = await ApiClient.post(
+      'get_specific_error_if_no_slots',
+      body: json.encode({'_restaurant' : restoId, '_date' : date.toIso8601String()})
+    );
+    if(response.statusCode != 200){
+      throw Exception('Failed to get available slots');
+    }
+    final dynamic body = json.decode(response.body);
+    final String value = body is String ? body : body.toString();
+
+    return _setReason(body);
+
+  }
+
+  static NoSlotsReason _setReason(String value) {
+    switch (value) {
+      case 'closed': return NoSlotsReason.closed;
+      case 'already_booked_service': return NoSlotsReason.alreadyBookedService;
+      case 'no_capacity': return NoSlotsReason.noCapacity;
+      default: throw Exception('Unknown no_slots_reason: $value');
+    }
   }
 }
