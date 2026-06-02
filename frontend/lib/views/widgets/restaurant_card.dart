@@ -7,6 +7,7 @@ import '../../providers/client_state_provider.dart';
 class RestaurantCard extends ConsumerWidget {
   final Restaurant restaurant;
 
+
   const RestaurantCard({
     super.key,
     required this.restaurant,
@@ -68,9 +69,11 @@ class RestaurantCard extends ConsumerWidget {
           ],
         ),
         trailing: const Icon(Icons.chevron_right),
-        onTap: () {
-          notifier.currentRestaurant = restaurant;
-          Navigator.pushNamed(context, '/restaurant_details');
+        onTap: () async {
+          await notifier.selectRestaurant(restaurant);
+          if (context.mounted) {
+            Navigator.pushNamed(context, '/restaurant_details');
+          }
         },
       ),
     );
