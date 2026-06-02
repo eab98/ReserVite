@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart';
 import 'package:prbd_2526_a03/core/services/restaurant_services.dart';
 import 'package:prbd_2526_a03/core/services/reservation_services.dart';
+import 'package:prbd_2526_a03/models/no_slots_reason.dart';
 import 'package:prbd_2526_a03/models/reservation.dart';
 import 'package:prbd_2526_a03/models/restaurant.dart';
 import 'package:prbd_2526_a03/models/services.dart';
@@ -15,23 +16,32 @@ class ClientState {
   final List<Restaurant> restaurants;
   final Restaurant? currentRestaurant;
   final List<Services>? currentRestaurantServices;
+  final List<DateTime>? availableSlots;
+  final NoSlotsReason? noSlotsError;
+
 
   ClientState({required this.reservations, this.currentReservationDetails, required this.restaurants,
-    this.currentRestaurantServices, this.currentRestaurant});
+    this.currentRestaurantServices, this.currentRestaurant, this.availableSlots, this.noSlotsError});
 
   ClientState copyWith({
      final List<Reservation>? reservations,
     final AsyncValue<Reservation>? currentReservationDetails,
     final List<Restaurant>? restaurants,
     final List<Services>? currentRestaurantServices,
-    final Restaurant? currentRestaurant
+    final Restaurant? currentRestaurant,
+    final List<DateTime>? availableSlots,
+    final NoSlotsReason? noSlotsError
   })
   {
     return ClientState(reservations: reservations ?? this.reservations,
                             currentReservationDetails: currentReservationDetails ?? this.currentReservationDetails,
                             restaurants: restaurants ?? this.restaurants,
                             currentRestaurantServices: currentRestaurantServices ?? this.currentRestaurantServices,
-                            currentRestaurant: currentRestaurant ?? this.currentRestaurant);
+                            currentRestaurant: currentRestaurant ?? this.currentRestaurant,
+                            availableSlots: availableSlots ?? this.availableSlots,
+                            noSlotsError: noSlotsError ?? this.noSlotsError
+
+    );
 
   }
 }
@@ -139,5 +149,75 @@ class ClientStateNotifier extends AsyncNotifier<ClientState>{
       ));
     }
   }
+
+  Future<void> loadFirstAvailableSlots(int restaurantId, int numberOfGuests) async {
+    final previous = state.value;
+    //si jamais on appelle cette methode avant le build et que le state est null
+    if (previous == null) return;
+
+    //prendre l'état précédent et en faire une copie avec seulement ces attributs là qui ont changé
+    state = AsyncLoading();
+
+    DateTime day = DateTime(2024, 12, 4);
+
+    // DateTime(
+    //     DateTime.now().year, DateTime.now().month, DateTime.now().day);
+     const maxDays = 30;
+
+    try {
+      for(int i = 0; i < maxDays; i++){
+        final slots = await ReservationServices.getAvailableSlotsForDate(restaurantId, day, numberOfGuests);
+        print('day=$day slots=${slots.length}');
+        if(slots.isNotEmpty) {
+          state = AsyncData(previous.copyWith(
+            availableSlots: slots,
+            noSlotsError: null
+          ));
+          return;
+        }
+
+        //si on a trouvé aucune dispo, on incrémente le jour d e 1
+        day = day.add(const Duration(days: 1));
+
+      }
+      //on a rien trouvé
+      state = AsyncData(previous.copyWith(
+        availableSlots: const []
+      ));
+
+    }catch(e, st) {
+      state = AsyncError(e, st);
+    }
+
+  }
+
+  Future<void> loadSlotsPerDay(int restaurantId, DateTime date,int numberOfGuests) async {
+    final previous = state.value;
+    if (previous == null) return;
+
+    state = AsyncLoading();
+
+    try {
+      final slots = await ReservationServices.getAvailableSlotsForDate(restaurantId, date, numberOfGuests);
+
+      if(slots.isNotEmpty){
+        state = AsyncData(previous.copyWith(
+          availableSlots: slots,
+          noSlotsError: null
+        ));
+      }else{
+        //on trouve rien
+        final error = await ReservationServices.getSpecificErrorIfNoSlots(restaurantId, date);
+        state = AsyncData(previous.copyWith(
+          availableSlots: [],
+          noSlotsError: error
+        ));
+      }
+    }catch (e,st){
+      state = AsyncError(e, st);
+    }
+  }
+
+
 
 }
