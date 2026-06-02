@@ -9,6 +9,18 @@ class RestaurantDetailsScreen extends ConsumerWidget {
 
   const RestaurantDetailsScreen({super.key});
 
+  String formatServices(List<Services>? services) {
+    if (services == null || services.isEmpty) {
+      return 'Fermé';
+    }
+
+    return services
+        .map((service) {
+      return '${service.startTime.substring(0, 5)} - ${service.endTime.substring(0, 5)}';
+    })
+        .join('\n');
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(clientStateProvider);
@@ -178,7 +190,7 @@ class RestaurantDetailsScreen extends ConsumerWidget {
                                 ),
                                 Expanded(
                                   child: Text(
-                                    servicesByDay.containsKey(1) ? servicesByDay[1].toString() : 'Fermé',
+                                    formatServices(servicesByDay[1]),
                                     style: const TextStyle(
                                         fontFamily: 'monospace'),
                                   ),
@@ -201,7 +213,7 @@ class RestaurantDetailsScreen extends ConsumerWidget {
                                 ),
                                 Expanded(
                                   child: Text(
-                                    servicesByDay.containsKey(2) ? servicesByDay[2].toString() : 'Fermé',
+                                    formatServices(servicesByDay[2]),
                                     style: const TextStyle(
                                         fontFamily: 'monospace'),
                                   ),
@@ -224,7 +236,7 @@ class RestaurantDetailsScreen extends ConsumerWidget {
                                 ),
                                 Expanded(
                                   child: Text(
-                                    servicesByDay.containsKey(3) ? servicesByDay[3].toString() : 'Fermé',
+                                    formatServices(servicesByDay[3]),
                                     style: const TextStyle(
                                         fontFamily: 'monospace'),
                                   ),
@@ -247,7 +259,7 @@ class RestaurantDetailsScreen extends ConsumerWidget {
                                 ),
                                 Expanded(
                                   child: Text(
-                                    servicesByDay.containsKey(4) ? servicesByDay[4].toString() : 'Fermé',
+                                    formatServices(servicesByDay[4]),
                                     style: const TextStyle(
                                         fontFamily: 'monospace'),
                                   ),
@@ -277,7 +289,7 @@ class RestaurantDetailsScreen extends ConsumerWidget {
                                 ),
                                 Expanded(
                                   child: Text(
-                                    servicesByDay.containsKey(5) ? servicesByDay[5].toString() : 'Fermé',
+                                    formatServices(servicesByDay[5]),
                                     style: const TextStyle(
                                         fontFamily: 'monospace'),
                                   ),
@@ -300,7 +312,7 @@ class RestaurantDetailsScreen extends ConsumerWidget {
                                 ),
                                 Expanded(
                                   child: Text(
-                                    servicesByDay.containsKey(6) ? servicesByDay[6].toString() : 'Fermé',
+                                    formatServices(servicesByDay[6]),
                                     style: const TextStyle(
                                         fontFamily: 'monospace'),
                                   ),
@@ -323,7 +335,7 @@ class RestaurantDetailsScreen extends ConsumerWidget {
                                 ),
                                 Expanded(
                                   child: Text(
-                                    servicesByDay.containsKey(7) ? servicesByDay[7].toString() : 'Fermé',
+                                    formatServices(servicesByDay[7]),
                                     style: const TextStyle(
                                         fontFamily: 'monospace'),
                                   ),
