@@ -420,7 +420,7 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
       );
 
       ref.read(clientStateProvider.notifier).refresh();
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushNamed(context, '/home');
     } catch (e) {
       if(!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
