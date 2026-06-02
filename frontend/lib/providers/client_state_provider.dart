@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart';
-import 'package:prbd_2526_a03/core/services/find_restaurant_service.dart';
+import 'package:prbd_2526_a03/core/services/restaurant_services.dart';
 import 'package:prbd_2526_a03/core/services/reservation_services.dart';
 import 'package:prbd_2526_a03/models/reservation.dart';
 import 'package:prbd_2526_a03/models/restaurant.dart';
@@ -44,7 +44,7 @@ class ClientStateNotifier extends AsyncNotifier<ClientState>{
   Future<ClientState> build() async {
     ref.watch(currentUserProvider);
     final list = await ReservationServices.getMyReservations();
-    final restList = await FindRestaurantService.getMatchingRestaurants("");
+    final restList = await RestaurantServices.getMatchingRestaurants("");
     return ClientState(reservations: list, restaurants: restList);
   }
 
@@ -78,7 +78,7 @@ class ClientStateNotifier extends AsyncNotifier<ClientState>{
       ),
     );
     try {
-      final data = await FindRestaurantService.getMatchingRestaurants(filter);
+      final data = await RestaurantServices.getMatchingRestaurants(filter);
       state = AsyncData(state.value!.copyWith(restaurants: data));
     } catch (e) {
       state = AsyncError(e, StackTrace.current);
@@ -109,7 +109,7 @@ class ClientStateNotifier extends AsyncNotifier<ClientState>{
 
     try {
       final data =
-      await FindRestaurantService.getServices(restaurantId);
+      await RestaurantServices.getServices(restaurantId);
 
       final current = state.value ?? previous;
 

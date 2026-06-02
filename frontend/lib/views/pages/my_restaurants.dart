@@ -1,30 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
-import 'package:prbd_2526_a03/providers/client_state_provider.dart';
-import 'package:prbd_2526_a03/providers/current_user_provider.dart';
 
+void main() async {
+  await initializeDateFormatting('fr_FR', null);
+  runApp(
+    MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        useMaterial3: true,
+      ),
+      home: const MyRestaurantsScreen(),
+    ),
+  );
+}
 
-class MyRestaurantsScreen extends ConsumerStatefulWidget {
+class MyRestaurantsScreen extends StatelessWidget {
   const MyRestaurantsScreen({super.key});
 
   @override
-  ConsumerState<MyRestaurantsScreen> createState() => _MyRestaurantsScreen();
-}
-
-class _MyRestaurantsScreen extends ConsumerState<MyRestaurantsScreen> {
-  
-  Future<void> _logout(BuildContext context) async{
-    await ref.read(currentUserProvider.notifier).logout();
-    if(!context.mounted) return;
-    Navigator.pushReplacementNamed(context, '/login');
-  } 
-
-  @override
   Widget build(BuildContext context) {
-    final asyncState = ref.watch(clientStateProvider);
-    final notifier = ref.read(clientStateProvider.notifier);
-
     final theme = Theme.of(context);
     final simulatedTime = DateTime(2024, 12, 4, 16, 0);
 
@@ -41,7 +37,7 @@ class _MyRestaurantsScreen extends ConsumerState<MyRestaurantsScreen> {
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Déconnexion (Benoît P.)',
-            onPressed: () => _logout(context),
+            onPressed: () {},
           ),
         ],
         elevation: 2,
@@ -55,7 +51,7 @@ class _MyRestaurantsScreen extends ConsumerState<MyRestaurantsScreen> {
               padding: const EdgeInsets.only(top: 2.0),
               child: Tooltip(
                 message:
-                'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
+                    'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
                 child: Text(
                   DateFormat('EEEE dd/MM/yyyy HH:mm', 'fr_FR')
                       .format(simulatedTime),
@@ -231,4 +227,3 @@ class _MyRestaurantsScreen extends ConsumerState<MyRestaurantsScreen> {
     );
   }
 }
-
