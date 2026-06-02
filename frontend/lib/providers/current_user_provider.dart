@@ -2,26 +2,36 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prbd_2526_a03/core/services/security.dart';
 import 'package:prbd_2526_a03/core/tools/params.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
+import '../models/user.dart';
 
 
-final currentUserProvider = AsyncNotifierProvider<CurrentUserNotifier, String?>(
+final currentUserProvider = AsyncNotifierProvider<CurrentUserNotifier, User?>(
     () => CurrentUserNotifier(),
 );
 
-class CurrentUserNotifier extends AsyncNotifier<String?> {
+class CurrentUserNotifier extends AsyncNotifier<User?> {
   @override
-  Future<String?> build() async {
-    state = AsyncData(Params.getValue('token'));
-    return state.value;
+  Future<User?> build() async {
+    final token = Params.getValue('token');
+
+    if (token == null) {
+      return null;
+    }
+
+    return User.fromToken(token);
   }
 
   Future<void> login(String email, String password) async {
     state = const AsyncLoading();
     try {
       var token = await Security.login(email, password);
-       Params.setValue('token', token);
-      state = AsyncData(token);
+
+      if (token == null) {
+        throw Exception('No token returned');
+      }
+
+      Params.setValue('token', token);
+      state = AsyncData(User.fromToken(token));
     }catch(e){
       state = AsyncError(
         "Something went wrong!\nPlease try again later.",
@@ -47,8 +57,12 @@ class CurrentUserNotifier extends AsyncNotifier<String?> {
     try{
       await Security.signup(fullName, email, password, phone);
       var token = await Security.login(email, password);
+      if (token == null) {
+        throw Exception('No token returned');
+      }
+
       Params.setValue('token', token);
-      state = AsyncData(token);
+      state = AsyncData(User.fromToken(token));
     } catch (e){
       state = AsyncError('"Something went wrong!\nPlease try again later."', StackTrace.current);
     }

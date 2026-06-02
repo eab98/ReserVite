@@ -17,9 +17,9 @@ class RestaurantCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(clientStateProvider);
     final notifier = ref.read(clientStateProvider.notifier);
-    String currency_logo = '';
+    String currencyLogo = '';
     if (restaurant.priceRange != null) {
-      currency_logo =
+      currencyLogo =
           '€' * restaurant.priceRange!;
     }
     return Card(
@@ -47,7 +47,7 @@ class RestaurantCard extends ConsumerWidget {
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  currency_logo,
+                  currencyLogo,
                   style: TextStyle(
                       fontSize: 12, color: Colors.grey[600]),
                 ),

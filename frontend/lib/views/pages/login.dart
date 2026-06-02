@@ -257,8 +257,17 @@ class LoginScreen extends ConsumerStatefulWidget {
       if(!context.mounted) return;
 
       securityState.when(
-          data: (_) => Navigator.pushReplacementNamed(
-          context, '/home'),
+          data: (user) {
+            if (user == null) {
+              Navigator.pushReplacementNamed(context, '/login');
+              return;
+            }
+            if (user.isManager) {
+              Navigator.pushReplacementNamed(context, '/home_manager');
+              return;
+            }
+            Navigator.pushReplacementNamed(
+                context, '/home');},
           error: (error, _) =>
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(

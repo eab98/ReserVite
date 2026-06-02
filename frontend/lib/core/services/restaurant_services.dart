@@ -37,4 +37,18 @@ class RestaurantServices {
     final List<dynamic> rows = body;
     return rows.map((rows) => Services.fromJson(rows)).toList();
   }
+
+  static Future<List<Restaurant>> getMyRestaurants()  async{
+    final response = await ApiClient.post(
+      'get_my_restaurants'
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to fetch restaurants, please try again later');
+    }
+
+    final dynamic body = json.decode(response.body);
+    final List<dynamic> rows = body;
+    return rows.map((rows) => Restaurant.fromJson(rows)).toList();
+  }
 }
