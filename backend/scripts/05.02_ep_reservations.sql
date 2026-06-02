@@ -281,6 +281,6 @@ create or replace function save_reservation(
     $$language plpgsql security definer ;
 grant execute on function save_reservation to authenticated;
 
-select auth.login_for_test('brlacroix@epfc.eu');
+/*select auth.login_for_test('brlacroix@epfc.eu');
 select save_reservation(3, '2024-12-04 19:00:00', 2, 'pending');
-select auth.logout_for_test();
+select auth.logout_for_test();*/

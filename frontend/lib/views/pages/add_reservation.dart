@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -21,12 +23,14 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
   String? specialRequest;
   DateTime? selectedSlot;
   bool? canFitTable;
+  Timer? _guestDebounce;
 
   final _specialRequestController = TextEditingController();
 
   @override
   void dispose() {
     _specialRequestController.dispose();
+    _guestDebounce?.cancel();
     super.dispose();
   }
 
@@ -226,17 +230,14 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
                             icon: const Icon(Icons.remove),
                             //setState force le reload de la page
                             onPressed: numberOfGuests > 1
-                                ? () => setState(()
-                            {numberOfGuests--;
-                              selectedSlot=null;
-                              canFitTable = null;
-                            })
+                                ? () => _onGuestChanged(clientState, -1)
                                 : null,
                           ),
                           IconButton(
                             icon: const Icon(Icons.add),
-                            onPressed: numberOfGuests < 10 ? () =>
-                                setState(() => numberOfGuests++) : null,
+                            onPressed: numberOfGuests < 10
+                                ? () => _onGuestChanged(clientState, 1)
+                                : null,
                           ),
                         ],
                       ),
@@ -414,7 +415,7 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
 
       //si jamais on quitte la fenêtre alors que la methode n est pas terminée, on arrête le processus
 
-      if(!context.mounted) return;
+      if(!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Réservation créée avec succès'), backgroundColor: Colors.green),
       );
@@ -427,5 +428,38 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
         SnackBar(content: Text('Erreur: $e'), backgroundColor: Colors.red,),
       );
     }
+  }
+
+
+  void _onGuestChanged(ClientState clientState, int delta) {
+    setState(() => numberOfGuests += delta);
+
+    _guestDebounce?.cancel();
+    _guestDebounce = Timer(const Duration(milliseconds: 500), () async {
+      // dès que le nb de guests change, on recheck la disponibilité
+      final restaurant = clientState.currentRestaurant;
+      if (restaurant == null) return;
+
+      // on recherche les slots dispo pour ce nombre de guests
+      //date écrite à la main, à changer une fois que time travel est fait
+      final date = selectedDate
+          ?? (clientState.availableSlots?.isNotEmpty == true
+              ? DateTime(clientState.availableSlots!.first.year,
+              clientState.availableSlots!.first.month,
+              clientState.availableSlots!.first.day)
+              : DateTime(2024, 12, 4));
+
+
+      ref.read(clientStateProvider.notifier)
+          .loadSlotsPerDay(restaurant.id, date, numberOfGuests);
+
+      if (selectedSlot != null) {
+      final fits = await ReservationServices.checkCapacity(
+      restaurant.id, numberOfGuests, selectedSlot!);
+
+      //mounted donc toujours sur la page
+      if (mounted) setState(() => canFitTable = fits);
+      }
+    });
   }
 }
