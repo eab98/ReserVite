@@ -6,6 +6,8 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:prbd_2526_a03/core/services/reservation_services.dart';
 import 'package:prbd_2526_a03/models/no_slots_reason.dart';
+import 'package:prbd_2526_a03/providers/reference_time_provider.dart';
+import 'package:prbd_2526_a03/views/widgets/time_travel_widget.dart';
 
 import '../../core/tools/debounce.dart';
 import '../../providers/client_state_provider.dart';
@@ -94,7 +96,6 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
     final asyncState = ref.watch(clientStateProvider);
 
     final theme = Theme.of(context);
-    final simulatedTime = DateTime(2024, 12, 4, 16, 0);
 
     return Scaffold(
       appBar: AppBar(
@@ -121,19 +122,7 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
           child: SafeArea(
             child: Padding(
               padding: const EdgeInsets.only(top: 2.0),
-              child: Tooltip(
-                message:
-                'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
-                child: Text(
-                  DateFormat('EEEE dd/MM/yyyy HH:mm', 'fr_FR')
-                      .format(simulatedTime),
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: Colors.grey[400],
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
-              ),
+              child: TimeTravelWidget(),
             ),
           ),
         ),
@@ -355,17 +344,26 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
     if (restaurant == null) return;
 
 
+    final referenceTime = ref.read(referenceTimeProvider);
     /*si y a une selected date sinon si il y a des availableSlots, on affiche la date du premier slot(situation initiale
     si l'user n'a pas changé de date)*/
     final initial = selectedDate ??
         (clientState.availableSlots?.isNotEmpty == true ?
-        clientState.availableSlots!.first : DateTime(2024, 12, 4));
+        clientState.availableSlots!.first : referenceTime);
+
+
+    /*
+    ici initialDate date qui s 'affiche a l'ouverture du calendrie doit être
+    comprise entre first(premieredate selectionnable) et last date mais ca pose probleme pour les resa dans le passe
+    donc on garde la plus ancienne des deux, soit le temps de reference soit le temps de la resa
+     */
+    final earliest = initial.isBefore(referenceTime) ? initial : referenceTime;
 
     final selected = await showDatePicker(
         context: context,
         initialDate: initial,
-        firstDate: DateTime(2024, 12, 1),
-        lastDate: DateTime(2025, 12, 31)
+        firstDate: earliest,
+        lastDate: referenceTime.add(const Duration(days: 100))
     );
 
     if (selected != null) {
@@ -384,12 +382,14 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
     final restaurant = _restaurantId;
     if (restaurant == null) return;
 
+    final referenceTime = ref.read(referenceTimeProvider);
+
     final base = selectedDate
         ?? (clientState.availableSlots?.isNotEmpty == true
             ? DateTime(clientState.availableSlots!.first.year,
             clientState.availableSlots!.first.month,
             clientState.availableSlots!.first.day)
-            : DateTime(2024, 12, 4));
+            : referenceTime);
 
     final newDate = DateTime(base.year, base.month, base.day + delta);
 
@@ -478,8 +478,7 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
 
     final details = state.currentReservationDetails?.value;
 
-    //à changer dès que j'ai time travel
-    final referenceTime = DateTime(2024, 12, 4, 16, 0);
+    final referenceTime = ref.read(referenceTimeProvider);
 
     if (details != null &&
         details.status == 'confirmed' &&
@@ -529,6 +528,10 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
       final restaurant = _restaurantId;
       if (restaurant == null) return;
 
+      final referenceTime = ref.read(referenceTimeProvider);
+      final refDay = DateTime(referenceTime.year, referenceTime.month, referenceTime.day); //besoin juste de la date de reftime
+
+
       // on recherche les slots dispo pour ce nombre de guests
       //date écrite à la main, à changer une fois que time travel est fait
       final date = selectedDate
@@ -536,7 +539,7 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
               ? DateTime(clientState.availableSlots!.first.year,
               clientState.availableSlots!.first.month,
               clientState.availableSlots!.first.day)
-              : DateTime(2024, 12, 4));
+              : refDay);
 
 
       ref.read(clientStateProvider.notifier)
