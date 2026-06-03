@@ -22,11 +22,15 @@ $$
          perform auth.check_logged();
          substr = '%' || lower(filter) || '%';
          return query
-         select distinct r.id, r.name, r.address, r.city, r.phone, r.description, r.rating, r.price_range, r.slot_duration, res.datetime
-         from restaurants r join reservations res on r.id = res.restaurant
-                  where lower(r.name) like substr or lower(r.description) like substr or lower(r.city) like substr
-                  and res.datetime > ALL(select resa.datetime from reservations resa where resa.restaurant = r.id and resa.client = auth.id())
-         order by res.datetime DESC;
+             select r.id, r.name, r.address, r.city, r.phone, r.description,
+                    r.rating, r.price_range, r.slot_duration,
+                    (select max(res.datetime) from reservations res
+                     where res.restaurant = r.id and res.client = auth.id()) as latest_reservation
+             from restaurants r
+             where (lower(r.name) like substr
+                 or lower(r.description) like substr
+                 or lower(r.city) like substr)
+             order by latest_reservation desc nulls last;
      end;
 $$ language plpgsql security definer;
 
