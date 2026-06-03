@@ -5,6 +5,8 @@ import 'package:prbd_2526_a03/providers/manager_state_provider.dart';
 import 'package:prbd_2526_a03/views/widgets/reservation_tables_card.dart';
 import 'package:prbd_2526_a03/views/widgets/time_travel_widget.dart';
 
+import '../../core/services/reservation_services.dart';
+
 class ReservationDetailsManagerScreen extends ConsumerWidget {
   const ReservationDetailsManagerScreen({super.key});
 
@@ -230,7 +232,7 @@ class ReservationDetailsManagerScreen extends ConsumerWidget {
                       ],
                         const SizedBox(height: 8),
                         OutlinedButton.icon(
-                          onPressed: () {},
+                          onPressed: () => _confirmCancel(context, ref, reservation.id),
                           icon: const Icon(Icons.cancel),
                           label: const Text('Annuler'),
                         ),
@@ -241,6 +243,44 @@ class ReservationDetailsManagerScreen extends ConsumerWidget {
           );
         }
     );
+  }
+  Future<void> _confirmCancel(BuildContext context, WidgetRef ref, int resaId) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+          title: const Text('Annuler la réservation'),
+          content: const Text('Êtes-vous sûr de vouloir annuler cette réservation?'),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Non')),
+            TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                child: const Text('Oui')),
+          ]
+      ),
+
+    );
+
+    if (confirmed != true) return;
+
+    await ReservationServices.cancelReservation(resaId);
+
+    if (!context.mounted) return;
+
+    final notifier = ref.read(managerStateProvider.notifier);
+    await notifier.refreshReservationsForCurrentRestaurant();
+    await notifier.refreshRestaurants();
+
+    final list = ref.read(managerStateProvider).value!.reservations;
+    await notifier.selectReservation(list.firstWhere((r) => r.id == resaId));
+
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Réservation annulée'), backgroundColor: Colors.green),
+    );
+
   }
 
   Widget _statusIcon(String status){

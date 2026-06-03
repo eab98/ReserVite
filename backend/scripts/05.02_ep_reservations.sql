@@ -318,6 +318,7 @@ create or replace function cancel_reservation(_resa_id int) returns void as
     $$language plpgsql security definer ;
 
 grant execute on function cancel_reservation(int) to authenticated;
+grant execute on function cancel_reservation to manager;
 
 
 -- select auth.login_for_test('brlacroix@epfc.eu');
