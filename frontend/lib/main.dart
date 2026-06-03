@@ -1,23 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:prbd_2526_a03/core/tools/params.dart';
+import 'package:prbd_2526_a03/views/pages/add_reservation.dart';
+import 'package:prbd_2526_a03/views/pages/assign_tables.dart';
+import 'package:prbd_2526_a03/views/pages/find_restaurants.dart';
+import 'package:prbd_2526_a03/views/pages/login.dart';
+import 'package:prbd_2526_a03/views/pages/my_reservations.dart';
+import 'package:prbd_2526_a03/views/pages/my_restaurants.dart';
+import 'package:prbd_2526_a03/views/pages/reservation_details_manager.dart';
+import 'package:prbd_2526_a03/views/pages/restaurant_details.dart';
+import 'package:prbd_2526_a03/views/pages/restaurant_management_reservations.dart';
+import 'package:prbd_2526_a03/views/pages/signup.dart';
 
-void main() {
-  runApp(TestPage());
-}
 
-class TestPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+void main() async {
+  await Params.init();
+  await initializeDateFormatting('fr_FR', null);
+  runApp(ProviderScope(
+    child : MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
-        colorScheme: .fromSeed(seedColor: Colors.blue),
       ),
-      home: Scaffold(
-        appBar: AppBar(title: Text('Test Page')),
-        body: Center(
-          child: Text('Welcome group a03!', style: TextStyle(fontSize: 24)),
-        ),
-      ),
-    );
-  }
+      home: LoginScreen(),
+      routes: {
+        '/login' :(context) => const LoginScreen(),
+        '/signup' : (context) => const SignupScreen(),
+        '/home' : (context) => const MyReservationsScreen(),
+        '/home_manager': (context) => const MyRestaurantsScreen(),
+        '/find_restaurants' : (context) => const FindRestaurantsScreen(),
+        '/restaurant_details': (context) => const RestaurantDetailsScreen(),
+        '/add_reservation' : (context) => const NewReservationScreen(),
+        '/restaurant_management_reservations' : (context) => const RestaurantManagementReservationsScreen(),
+        '/reservation_details_manager' : (context) => const ReservationDetailsManagerScreen(),
+        '/assign_tables' : (context) => const AssignTablesScreen()
+      }
+    ),
+  )
+  );
 }
+
+
+
