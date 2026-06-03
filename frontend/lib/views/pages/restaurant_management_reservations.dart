@@ -184,10 +184,17 @@ class _RestaurantManagementReservationsScreenState
   Widget _buildReservationCard(Reservation reservation) {
     return ReservationCard(
       reservation: reservation,
-      title: reservation.clientName ?? 'Client inconnu',
-      subtitle: reservation.restoName,
-      subtitleIcon: Icons.restaurant,
-      onTap: () {},
+      clientName: reservation.clientName ?? 'Client inconnu',
+      nameResto: reservation.restoName,
+      cardIcon: Icons.restaurant,
+      onTap: () async {
+        await ref.read(managerStateProvider.notifier).selectReservation(reservation);
+        if (context.mounted) {
+          Navigator.pushNamed(
+              context,
+              '/reservation_details_manager');
+        }
+      },
     );
   }
 

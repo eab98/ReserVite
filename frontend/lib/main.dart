@@ -7,6 +7,7 @@ import 'package:prbd_2526_a03/views/pages/find_restaurants.dart';
 import 'package:prbd_2526_a03/views/pages/login.dart';
 import 'package:prbd_2526_a03/views/pages/my_reservations.dart';
 import 'package:prbd_2526_a03/views/pages/my_restaurants.dart';
+import 'package:prbd_2526_a03/views/pages/reservation_details_manager.dart';
 import 'package:prbd_2526_a03/views/pages/restaurant_details.dart';
 import 'package:prbd_2526_a03/views/pages/restaurant_management_reservations.dart';
 import 'package:prbd_2526_a03/views/pages/signup.dart';
@@ -31,7 +32,8 @@ void main() async {
         '/find_restaurants' : (context) => const FindRestaurantsScreen(),
         '/restaurant_details': (context) => const RestaurantDetailsScreen(),
         '/add_reservation' : (context) => const NewReservationScreen(),
-        '/restaurant_management_reservations' : (context) => const RestaurantManagementReservationsScreen()
+        '/restaurant_management_reservations' : (context) => const RestaurantManagementReservationsScreen(),
+        '/reservation_details_manager': (context) => const ReservationDetailsManagerScreen()
       }
     ),
   )
