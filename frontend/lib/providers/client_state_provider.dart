@@ -150,7 +150,7 @@ class ClientStateNotifier extends AsyncNotifier<ClientState>{
     }
   }
 
-  Future<void> loadFirstAvailableSlots(int restaurantId, int numberOfGuests) async {
+  Future<void> loadFirstAvailableSlots(int restaurantId, int numberOfGuests, [int? excluded]) async {
     final previous = state.value;
     //si jamais on appelle cette methode avant le build et que le state est null
     if (previous == null) return;
@@ -166,7 +166,7 @@ class ClientStateNotifier extends AsyncNotifier<ClientState>{
 
     try {
       for(int i = 0; i < maxDays; i++){
-        final slots = await ReservationServices.getAvailableSlotsForDate(restaurantId, day, numberOfGuests);
+        final slots = await ReservationServices.getAvailableSlotsForDate(restaurantId, day, numberOfGuests, excluded);
         print('day=$day slots=${slots.length}');
         if(slots.isNotEmpty) {
           state = AsyncData(previous.copyWith(
@@ -191,14 +191,14 @@ class ClientStateNotifier extends AsyncNotifier<ClientState>{
 
   }
 
-  Future<void> loadSlotsPerDay(int restaurantId, DateTime date,int numberOfGuests) async {
+  Future<void> loadSlotsPerDay(int restaurantId, DateTime date,int numberOfGuests, [int? excluded]) async {
     final previous = state.value;
     if (previous == null) return;
 
     state = AsyncLoading();
 
     try {
-      final slots = await ReservationServices.getAvailableSlotsForDate(restaurantId, date, numberOfGuests);
+      final slots = await ReservationServices.getAvailableSlotsForDate(restaurantId, date, numberOfGuests, excluded);
 
       if(slots.isNotEmpty){
         state = AsyncData(previous.copyWith(

@@ -12,7 +12,9 @@ import '../../providers/client_state_provider.dart';
 
 
 class NewReservationScreen extends ConsumerStatefulWidget {
-  const NewReservationScreen({super.key});
+  final int? resaId;
+  const NewReservationScreen({super.key, this.resaId});
+
 
   @override
   ConsumerState<NewReservationScreen> createState() => _NewReservationScreen();
@@ -27,6 +29,11 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
 
   final _specialRequestController = TextEditingController();
 
+  bool get isEdit => widget.resaId != null;
+
+  int? _restaurantId;
+  String _restaurantName = '';
+
   @override
   void dispose() {
     _specialRequestController.dispose();
@@ -37,15 +44,47 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
-      final restaurant = ref
-          .read(clientStateProvider)
-          .value
-          ?.currentRestaurant;
-      if (restaurant != null) {
-        ref.read(clientStateProvider.notifier)
-            .loadFirstAvailableSlots(restaurant.id, numberOfGuests);
+    Future.microtask(() async {
+
+
+      final notifier = ref.read(clientStateProvider.notifier);
+      //pré-remplissage des fields à l'ouverture de la page en mode edit
+
+      if(isEdit){
+        await notifier.loadReservationDetails(widget.resaId!);
+        final details = ref.read(clientStateProvider).value?.currentReservationDetails?.value;
+        if(details == null) return;
+
+        setState(() {
+          selectedDate = DateTime(details.dateTime.year, details.dateTime.month, details.dateTime.day);
+          selectedSlot = details.dateTime;
+          numberOfGuests = details.numberOfGuests;
+          _specialRequestController.text = details.specialRequests ?? '';
+        });
+
+        if(details.restoId != null){
+          //on appelle la methode en dehors du setstate car setstate se charge des champs locaux, loadslotsperday met a jour le state du provider donc non local
+          final day = DateTime(details.dateTime.year, details.dateTime.month, details.dateTime.day);
+          notifier.loadSlotsPerDay(details.restoId!, day, numberOfGuests, widget.resaId);
+
+          _restaurantId = details.restoId;
+          _restaurantName = details.name;
+        }
+
+
+      } else {
+        //si on crée, rien a prefill, pas de resaId
+        final restaurant = ref.read(clientStateProvider).value?.currentRestaurant;
+        if(restaurant!=null){
+          notifier.loadFirstAvailableSlots(restaurant.id, numberOfGuests);
+          _restaurantId = restaurant.id;
+          _restaurantName = restaurant.name;
+        }
+
+
       }
+
+
     });
   }
 
@@ -63,7 +102,8 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('Nouvelle réservation'),
+        title:  Text(
+            isEdit ? 'Modifier la réservation' : 'Nouvelle réservation'),
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
@@ -111,7 +151,8 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      clientState.currentRestaurant!.name,
+                      isEdit ? 'Modifier la réservation'
+                      : (clientState.currentRestaurant?.name ?? ''),
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -205,7 +246,7 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
                                   onTap: () async {
                                   setState(() => selectedSlot = slot);
                                   final check =
-                                  await ReservationServices.checkCapacity(clientState.currentRestaurant!.id, numberOfGuests, slot);
+                                  await ReservationServices.checkCapacity(_restaurantId!, numberOfGuests, slot, widget.resaId);
                                   setState(()=>canFitTable = check);
                                   },
                                   borderRadius: BorderRadius.circular(16),
@@ -261,13 +302,13 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
                     const SizedBox(height: 32),
                     ElevatedButton.icon(
                       onPressed: (selectedSlot != null && canFitTable == true)
-                          ? () => _createReservation(clientState)
+                          ? () => isEdit ? _saveChanges(clientState) : _createReservation(clientState)
                            : null,
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
                       icon: const Icon(Icons.add),
-                      label: const Text('Créer la réservation'),
+                      label:  Text(isEdit ? 'Modifier la réservation' : 'Créer la réservation'),
                     ),
                   ],
                 ),
@@ -310,7 +351,7 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
   }
 
   Future<void> _pickDate(ClientState clientState) async {
-    final restaurant = clientState.currentRestaurant;
+    final restaurant = _restaurantId;
     if (restaurant == null) return;
 
 
@@ -335,12 +376,12 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
       });
 
       ref.read(clientStateProvider.notifier).loadSlotsPerDay(
-          restaurant.id, selected, numberOfGuests);
+          restaurant, selected, numberOfGuests, widget.resaId);
     }
   }
 
   void _shiftDay(ClientState clientState, int delta) {
-    final restaurant = clientState.currentRestaurant;
+    final restaurant = _restaurantId;
     if (restaurant == null) return;
 
     final base = selectedDate
@@ -358,7 +399,7 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
       canFitTable = null;
     });
     ref.read(clientStateProvider.notifier)
-        .loadSlotsPerDay(restaurant.id, newDate, numberOfGuests);
+        .loadSlotsPerDay(restaurant, newDate, numberOfGuests, widget.resaId);
   }
 
   Widget _warningBox(NoSlotsReason reason) {
@@ -403,7 +444,7 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
   }
 
   Future<void> _createReservation(ClientState clientState) async {
-    final restaurant = clientState.currentRestaurant?.id;
+    final restaurant = _restaurantId;
     if(restaurant==null || selectedSlot==null) return;
 
     final text = _specialRequestController.text.trim();
@@ -429,13 +470,63 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
     }
   }
 
+  Future<void> _saveChanges(ClientState state) async {
+    if(_restaurantId == null || selectedSlot == null) return;
+
+    final text = _specialRequestController.text.trim();
+    final request = text.isEmpty ? null : text;
+
+    final details = state.currentReservationDetails?.value;
+
+    //à changer dès que j'ai time travel
+    final referenceTime = DateTime(2024, 12, 4, 16, 0);
+
+    if (details != null &&
+        details.status == 'confirmed' &&
+        details.dateTime.isAfter(referenceTime)) {
+      final agreed = await showDialog<bool>(
+        context: context,
+        builder: (context) =>
+            AlertDialog(
+              title: const Text('Modifier une réservation confirmée'),
+              content: const Text(
+                  'Cette réservation est confirmée. La modifier la remettra en attente '
+                      'et les tables associées seront libérées. Souhaitez-vous continuer ?'),
+              actions: [
+                TextButton(onPressed: () => Navigator.pop(context, false),
+                    child: const Text('Non')),
+                TextButton(onPressed: () => Navigator.pop(context, true),
+                    child: const Text('Oui')),
+              ],
+            ),
+      );
+      if (agreed != true) return;
+    }
+
+      try {
+        await ReservationServices.saveReservation(widget.resaId, _restaurantId!, selectedSlot!, numberOfGuests, 'pending', request);
+        if(!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Réservation modifiée avec succès'), backgroundColor: Colors.green));
+        ref.read(clientStateProvider.notifier).refresh();
+        ref.read(clientStateProvider.notifier).loadReservationDetails(widget.resaId!);
+        if (!mounted) return;
+        Navigator.pop(context);
+
+      } catch (e){
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Erreur: $e'), backgroundColor: Colors.red));
+      }
+  }
+
 
   void _onGuestChanged(ClientState clientState, int delta) {
     setState(() => numberOfGuests += delta);
 
     _guestDebounce(() async {
       // dès que le nb de guests change, on recheck la disponibilité
-      final restaurant = clientState.currentRestaurant;
+      final restaurant = _restaurantId;
       if (restaurant == null) return;
 
       // on recherche les slots dispo pour ce nombre de guests
@@ -449,11 +540,11 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
 
 
       ref.read(clientStateProvider.notifier)
-          .loadSlotsPerDay(restaurant.id, date, numberOfGuests);
+          .loadSlotsPerDay(restaurant, date, numberOfGuests, widget.resaId);
 
       if (selectedSlot != null) {
       final fits = await ReservationServices.checkCapacity(
-      restaurant.id, numberOfGuests, selectedSlot!);
+      restaurant, numberOfGuests, selectedSlot!, widget.resaId);
 
       //mounted donc toujours sur la page
       if (mounted) setState(() => canFitTable = fits);

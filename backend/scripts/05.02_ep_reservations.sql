@@ -11,12 +11,13 @@ create or replace function get_my_reservations()
         status status_type,
         city varchar,
         datetime timestamp,
-        number_of_guests int) as
+        number_of_guests int,
+         resto_id int) as
     $$
     begin
         perform auth.check_logged();
         return query
-        select resa.id, resto.name, resa.status, resto.city, resa.datetime, resa.number_of_guests
+        select resa.id, resto.name, resa.status, resto.city, resa.datetime, resa.number_of_guests, resto.id
         from reservations resa, restaurants resto
         where resa.restaurant = resto.id and resa.client = auth.id()
         order by resa.datetime DESC ;
@@ -38,12 +39,13 @@ create or replace function get_reservation_details(_id int)
        datetime timestamp,
        number_of_guests int,
        phone varchar,
-       special_request text) as
+       special_request text,
+       resto_id int) as
     $$
     begin
         perform auth.check_logged();
         return query
-        select resa.id, resto.name, resa.status, resto.address, resto.city, resa.datetime, resa.number_of_guests, resto.phone, resa.special_requests
+        select resa.id, resto.name, resa.status, resto.address, resto.city, resa.datetime, resa.number_of_guests, resto.phone, resa.special_requests, resto.id
         from reservations resa, restaurants resto
         where resa.restaurant = resto.id and resa.id = _id;
     end;
@@ -79,7 +81,7 @@ create or replace function get_service_for_datetime(_restaurant int, _date times
 
 
 --on regarde si le client n'a pas déjà réservé pour ce même service au même jour et au même resto
-create or replace function check_existing_reservation_for_service(_restaurant int, _date timestamp)
+create or replace function check_existing_reservation_for_service(_restaurant int, _date timestamp, _exclude_id_for_edit int default null)
     returns boolean as
     $$
     declare
@@ -99,6 +101,7 @@ create or replace function check_existing_reservation_for_service(_restaurant in
             FROM reservations resa
             WHERE resa.client = client_id and resa.restaurant = _restaurant and resa.datetime::date = _date::date
             and resa.datetime::time >= serv.start_time and resa.datetime::time < serv.end_time and resa.status in ('pending', 'confirmed')
+            and (_exclude_id_for_edit is null or resa.id <> _exclude_id_for_edit)
         );
 
 
@@ -107,7 +110,7 @@ create or replace function check_existing_reservation_for_service(_restaurant in
 
 --on regarde s'il existe une table disponible pour un nombre de guest donné pour un créneau donné
 
-create or replace function check_capacity(_restaurant int, _number_of_guests int, _date timestamp)
+create or replace function check_capacity(_restaurant int, _number_of_guests int, _date timestamp, _exclude_id_for_edit int default null)
     returns boolean as
     $$
     begin
@@ -119,15 +122,16 @@ create or replace function check_capacity(_restaurant int, _number_of_guests int
                                from reservation_tables rt, reservations resa
                                where rt."table" = t.id and rt.reservation = resa.id
                                and resa.datetime = _date
-                               and resa.status in ('pending', 'confirmed'))
+                               and resa.status in ('pending', 'confirmed')
+                            and (_exclude_id_for_edit is null or _exclude_id_for_edit <> resa.id))
 
         );
     end;
     $$language plpgsql security definer;
-grant execute on function check_capacity(int, int, timestamp) to authenticated;
+grant execute on function check_capacity(int, int, timestamp, int) to authenticated;
 
 --on regarde si un certain slot est disponible pour cette date la pour ce nombre de guests
-create or replace function check_slot_available(_restaurant int, _date timestamp, _number_of_guests int)
+create or replace function check_slot_available(_restaurant int, _date timestamp, _number_of_guests int, _exclude_id_for_edit int default null)
     returns boolean as
     $$
     declare
@@ -139,7 +143,7 @@ create or replace function check_slot_available(_restaurant int, _date timestamp
             return false;
         end if;
 
-        if (check_existing_reservation_for_service(_restaurant, _date)) then
+        if (check_existing_reservation_for_service(_restaurant, _date, _exclude_id_for_edit)) then
             return false;
         end if;
 
@@ -153,7 +157,7 @@ create or replace function check_slot_available(_restaurant int, _date timestamp
 
 --on cherche les slots disponibles pour une date donnée, si aucun slot il faut un message d'erreur spécifique
 
-create or replace function get_available_slots_for_date(_restaurant int, _date timestamp, _number_of_guests int)
+create or replace function get_available_slots_for_date(_restaurant int, _date timestamp, _number_of_guests int, _exclude_id_for_edit int default null)
 returns table(slot_datetime timestamp) as
     $$
     declare
@@ -178,11 +182,11 @@ returns table(slot_datetime timestamp) as
             from services s
             where s.restaurant=_restaurant and s.day_of_week = extract(isodow from _date)::int
             ) slot_candidates
-            where check_slot_available(_restaurant, slot_candidate, _number_of_guests);
+            where check_slot_available(_restaurant, slot_candidate, _number_of_guests, _exclude_id_for_edit);
 
     end;
     $$language plpgsql security definer ;
-grant execute on function get_available_slots_for_date(int, timestamp, int) to authenticated;
+grant execute on function get_available_slots_for_date(int, timestamp, int, int) to authenticated;
 
 --on regrde la raison spécifique pour laquelle in l'y a pas de spot disponible
 create or replace function get_specific_error_if_no_slots(_restaurant int, _date timestamp)
@@ -268,6 +272,7 @@ create or replace function save_reservation(
             returning id into _new_id;
             return _new_id;
         else
+            delete from reservation_tables where reservation = _id;
             update reservations set client = _client,
                                     restaurant=_restaurant,
                                     datetime = _date,

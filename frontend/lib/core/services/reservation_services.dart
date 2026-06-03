@@ -37,10 +37,14 @@ class ReservationServices {
 
   }
 
-  static Future<List<DateTime>> getAvailableSlotsForDate(int restoId, DateTime date, int numberOfGuests) async{
+  static Future<List<DateTime>> getAvailableSlotsForDate(int restoId, DateTime date, int numberOfGuests, [int? excluded]) async{
     final response = await ApiClient.post(
       'get_available_slots_for_date',
-      body : json.encode({'_restaurant' : restoId, '_date' : date.toIso8601String(), '_number_of_guests' : numberOfGuests})
+      body : json.encode({'_restaurant' : restoId,
+        '_date' : date.toIso8601String(),
+        '_number_of_guests' : numberOfGuests,
+        '_exclude_id_for_edit' : excluded
+      })
     );
 
     if(response.statusCode != 200){
@@ -74,11 +78,11 @@ class ReservationServices {
       default: throw Exception('Unknown no_slots_reason: $value');
     }
   }
-
-  static Future<bool> checkCapacity(int restoId, int numberOfGuests, DateTime slot) async {
+//[] pour dire que c'est optionnel, on  appeler la méthode avec ou sans ce param, null si on veut edit
+  static Future<bool> checkCapacity(int restoId, int numberOfGuests, DateTime slot, [int? excluded]) async {
     final response = await ApiClient.post(
       'check_capacity',
-      body : json.encode({'_restaurant' : restoId, '_number_of_guests' : numberOfGuests, '_date' : slot.toIso8601String()})
+      body : json.encode({'_restaurant' : restoId, '_number_of_guests' : numberOfGuests, '_date' : slot.toIso8601String(), '_exclude_id_for_edit' : excluded})
     );
     if(response.statusCode != 200){
       throw Exception('Failed to check capacity');
