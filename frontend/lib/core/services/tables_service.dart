@@ -1,5 +1,8 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
+import 'package:prbd_2526_a03/models/reservation.dart';
+
 import '../../models/tables.dart';
 import 'api_client.dart';
 
@@ -18,5 +21,40 @@ class TablesService {
     final dynamic body = json.decode(response.body);
     final List<dynamic> rows = body;
     return rows.map((rows) => Tables.fromJson(rows)).toList();
+  }
+
+  static Future<List<Tables>> getAllAvailableTables(int reservationId) async {
+    final response = await ApiClient.post(
+      'get_all_available_tables',
+      body: json.encode({
+        'reservation_id': reservationId,
+      }),
+      anonymous: false,
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to fetch available tables, please try again later');
+    }
+
+    final dynamic body = json.decode(response.body);
+    final List<dynamic> rows = body;
+
+    return rows.map((row) => Tables.fromJson(row)).toList();
+  }
+
+  static Future<void> assignTablesToReservation(Reservation reservation, List<int> tableIds) async {
+    final response = await ApiClient.post(
+      'assign_tables_to_reservation',
+      body: json.encode({
+        'reservation_id': reservation.id,
+        'guests': reservation.numberOfGuests,
+        'table_ids': tableIds
+      }),
+    );
+
+    if (response.statusCode != 200 && response.statusCode != 204) {
+      print('${response.statusCode} ${response.body}');
+      throw Exception('Failed to assign tables to reservation');
+    }
   }
 }

@@ -5,6 +5,8 @@ import 'package:prbd_2526_a03/core/services/tables_service.dart';
 import 'package:prbd_2526_a03/models/customer.dart';
 import 'package:prbd_2526_a03/models/reservation.dart';
 import 'package:prbd_2526_a03/models/tables.dart';
+import 'package:prbd_2526_a03/providers/reference_time_provider.dart';
+import 'package:prbd_2526_a03/providers/simulated_time_provider.dart';
 
 import '../core/services/restaurant_services.dart';
 import '../models/restaurant.dart';
@@ -17,6 +19,7 @@ class ManagerState {
   final List<Reservation> reservations;
   final Customer? currentCustomer;
   final List<Tables> currentTables;
+  final List<Tables> availableTables;
 
   const ManagerState({
     this.restaurants = const [],
@@ -24,7 +27,8 @@ class ManagerState {
     this.currentRestaurant,
     this.currentReservation,
     this.currentCustomer,
-    this.currentTables = const []
+    this.currentTables = const [],
+    this.availableTables = const []
   });
 
   ManagerState copyWith({
@@ -33,7 +37,8 @@ class ManagerState {
     Restaurant? currentRestaurant,
     Reservation? currentReservation,
     Customer? currentCustomer,
-    List<Tables>? currentTables
+    List<Tables>? currentTables,
+    List<Tables>? availableTables
   }) {
     return ManagerState(
       restaurants: restaurants ?? this.restaurants,
@@ -41,7 +46,8 @@ class ManagerState {
       currentRestaurant: currentRestaurant ?? this.currentRestaurant,
       currentReservation: currentReservation ?? this.currentReservation,
       currentCustomer: currentCustomer ?? this.currentCustomer,
-      currentTables: currentTables ?? this.currentTables
+      currentTables: currentTables ?? this.currentTables,
+      availableTables: availableTables ?? this.availableTables
     );
   }
 }
@@ -54,8 +60,8 @@ AsyncNotifierProvider<ManagerStateNotifier, ManagerState>(
 class ManagerStateNotifier extends AsyncNotifier<ManagerState> {
   @override
   Future<ManagerState> build() async {
-    final user =
-    await ref.watch(currentUserProvider.future);
+    ref.watch(simulatedTimeProvider);
+    final user = await ref.watch(currentUserProvider.future);
 
     if (user == null) {
       return const ManagerState();
@@ -136,6 +142,7 @@ class ManagerStateNotifier extends AsyncNotifier<ManagerState> {
     try {
       final customer = await CustomerServices.getUserByName(reservation.clientName!);
       final tables = await TablesService.getTablesForReservation(reservation.id);
+      final availableTables = await TablesService.getAllAvailableTables(reservation.id);
 
       final current = state.value ?? previous;
 
@@ -143,7 +150,8 @@ class ManagerStateNotifier extends AsyncNotifier<ManagerState> {
         current.copyWith(
             currentReservation: reservation,
             currentCustomer: customer,
-            currentTables: tables)
+            currentTables: tables,
+            availableTables: availableTables)
       );
     } catch (e, st) {
       state = AsyncError(e, st);
@@ -161,6 +169,7 @@ class ManagerStateNotifier extends AsyncNotifier<ManagerState> {
     try {
       final customer = await CustomerServices.getUserByName(reservation.clientName!);
       final tables = await TablesService.getTablesForReservation(reservation.id);
+      final availableTables = await TablesService.getAllAvailableTables(reservation.id);
 
       final current = state.value ?? previous;
 
@@ -168,7 +177,8 @@ class ManagerStateNotifier extends AsyncNotifier<ManagerState> {
           current.copyWith(
               currentReservation: reservation,
               currentCustomer: customer,
-              currentTables: tables)
+              currentTables: tables,
+              availableTables: availableTables)
       );
     } catch (e, st) {
       state = AsyncError(e, st);
@@ -193,6 +203,62 @@ class ManagerStateNotifier extends AsyncNotifier<ManagerState> {
 
       state = AsyncData(
         previous.copyWith(
+          reservations: reservations,
+        ),
+      );
+    } catch (e, st) {
+      state = AsyncError(e, st);
+    }
+  }
+
+  Future<void> refreshAvailableTablesForCurrentReservation() async {
+    final previous = state.value;
+    if (previous == null) return;
+
+    final reservation = previous.currentReservation;
+    if (reservation == null) return;
+
+    try {
+      final availableTables = await TablesService.getAllAvailableTables(reservation.id);
+
+      final currentTables = await TablesService.getTablesForReservation(reservation.id);
+
+      state = AsyncData(
+        previous.copyWith(
+          availableTables: availableTables,
+          currentTables: currentTables,
+        ),
+      );
+    } catch (e, st) {
+      state = AsyncError(e, st);
+    }
+  }
+
+  Future<void> assignTablesToCurrentReservation(List<int> tableIds) async {
+    final previous = state.value;
+    if (previous == null) return;
+
+    final reservation = previous.currentReservation;
+    if (reservation == null) return;
+
+    try {
+      await TablesService.assignTablesToReservation(reservation, tableIds);
+
+      final tables = await TablesService.getTablesForReservation(reservation.id);
+
+      final availableTables = await TablesService.getAllAvailableTables(reservation.id);
+
+      List<Reservation> reservations = previous.reservations;
+
+      final restaurant = previous.currentRestaurant;
+      if (restaurant != null) {
+        reservations = await ReservationServices.getAllReservationsForRestaurant(restaurant.id);
+      }
+
+      state = AsyncData(
+        previous.copyWith(
+          currentTables: tables,
+          availableTables: availableTables,
           reservations: reservations,
         ),
       );
