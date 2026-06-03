@@ -5,17 +5,17 @@ import '../../models/reservation.dart';
 
 class ReservationCard extends StatelessWidget {
   final Reservation reservation;
-  final String title;
-  final String subtitle;
-  final IconData subtitleIcon;
+  final String clientName;
+  final String nameResto;
+  final IconData cardIcon;
   final VoidCallback? onTap;
 
   const ReservationCard({
     super.key,
     required this.reservation,
-    required this.title,
-    required this.subtitle,
-    required this.subtitleIcon,
+    required this.clientName,
+    required this.nameResto,
+    required this.cardIcon,
     this.onTap,
   });
 
@@ -40,7 +40,7 @@ class ReservationCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      title,
+                      clientName,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -50,11 +50,11 @@ class ReservationCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        Icon(subtitleIcon, size: 16),
+                        Icon(cardIcon, size: 16),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            subtitle,
+                            nameResto,
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.grey[600],
