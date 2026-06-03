@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:prbd_2526_a03/core/tools/constants.dart';
 import 'package:prbd_2526_a03/providers/client_state_provider.dart';
 import '../widgets/restaurant_card.dart';
+import '../widgets/time_travel_widget.dart';
 import '../widgets/too_many_results_banner.dart';
 
 
@@ -45,19 +46,7 @@ class FindRestaurantsScreen extends ConsumerWidget {
           child: SafeArea(
             child: Padding(
               padding: const EdgeInsets.only(top: 2.0),
-              child: Tooltip(
-                message:
-                    'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
-                child: Text(
-                  DateFormat('EEEE dd/MM/yyyy HH:mm', 'fr_FR')
-                      .format(simulatedTime),
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: Colors.grey[400],
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
-              ),
+              child: TimeTravelWidget(),
             ),
           ),
         ),
