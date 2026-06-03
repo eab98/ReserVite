@@ -6,7 +6,8 @@ import 'package:prbd_2526_a03/core/services/api_client.dart';
 class TimeServices {
   static Future<DateTime?> getSimulatedTime() async {
     final response = await ApiClient.post(
-      'get_simulated_time'
+      'get_simulated_time',
+        anonymous: true
     );
 
     if(response.statusCode != 200){
