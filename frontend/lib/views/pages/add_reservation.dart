@@ -68,7 +68,7 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
           notifier.loadSlotsPerDay(details.restoId!, day, numberOfGuests, widget.resaId);
 
           _restaurantId = details.restoId;
-          _restaurantName = details.name;
+          _restaurantName = details.restoName;
         }
 
 
