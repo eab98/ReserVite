@@ -7,11 +7,13 @@ import '../../providers/client_state_provider.dart';
 
 class ManagerRestaurantCard extends ConsumerWidget {
   final Restaurant restaurant;
+  final VoidCallback? onTap;
 
 
   const ManagerRestaurantCard({
     super.key,
     required this.restaurant,
+    this.onTap
   });
 
   @override
@@ -83,7 +85,11 @@ class ManagerRestaurantCard extends ConsumerWidget {
           ],
         ),
         trailing: const Icon(Icons.chevron_right),
-        onTap: () {
+        onTap: () async {
+          // await notifier.selectRestaurant(restaurant);
+          if (context.mounted) {
+            Navigator.pushNamed(context, '/restaurant_management_reservations');
+          }
         },
       ),
     );

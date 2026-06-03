@@ -8,6 +8,8 @@ class Restaurant {
   final double? rating;
   final int? priceRange;
   final int slotDuration;
+  final DateTime? latestReservation;
+  final int? pendingRequests;
 
   const Restaurant({
     required this.id,
@@ -18,7 +20,9 @@ class Restaurant {
     this.description,
     this.rating,
     this.priceRange,
-    required this.slotDuration
+    required this.slotDuration,
+    this.latestReservation,
+    this.pendingRequests
   });
 
   factory Restaurant.fromJson(Map<String, dynamic> json) {
@@ -31,6 +35,8 @@ class Restaurant {
         description: json['description'],
         rating: json['rating'],
         priceRange: json['price_range'],
-        slotDuration: json['slot_duration']);
+        slotDuration: json['slot_duration'],
+        latestReservation: DateTime.parse(json['latest_reservation']),
+        pendingRequests: json['pending_requests']);
   }
 }

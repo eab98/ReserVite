@@ -89,6 +89,18 @@ class _MyRestaurantsScreen extends ConsumerState<MyRestaurantsScreen> {
               itemBuilder: (context, index) {
                 return ManagerRestaurantCard(
                   restaurant: managerState.restaurants[index],
+                  onTap: () async {
+                    await ref
+                        .read(managerStateProvider.notifier)
+                        .selectRestaurant(managerState.restaurants[index]);
+
+                    if (context.mounted) {
+                      Navigator.pushNamed(
+                        context,
+                        '/restaurant_management_reservations',
+                      );
+                    }
+                  },
                 );
               },
             );

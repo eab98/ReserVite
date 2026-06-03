@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 import '../../models/restaurant.dart';
 import '../../providers/client_state_provider.dart';
@@ -60,7 +61,7 @@ class RestaurantCard extends ConsumerWidget {
                     size: 14, color: Colors.grey),
                 const SizedBox(width: 4),
                 Text(
-                  'Aujourd\'hui à 12:30',
+                  restaurant.latestReservation != null ? '${DateFormat('EEE dd/MM/yyyy', 'fr_FR').format(restaurant.latestReservation!)} à ${DateFormat('HH:mm').format(restaurant.latestReservation!)}' : "",
                   style: TextStyle(
                       fontSize: 12, color: Colors.grey[600]),
                 ),

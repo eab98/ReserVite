@@ -108,4 +108,21 @@ class ReservationServices {
     return body is int ? body : body.first.values.first as int;
 
   }
+
+  static Future<List<Reservation>> getAllReservationsForRestaurant(int restaurantId) async {
+    final response = await ApiClient.post(
+      'get_all_reservations_for_restaurant',
+      body: json.encode({
+        'restaurant_id': restaurantId
+      })
+    );
+
+    if(response.statusCode != 200){
+      throw Exception('Failed to get reservations, please try again later');
+    }
+
+    final dynamic body = json.decode(response.body);
+    final List<dynamic> rows = body;
+    return rows.map((rows) => Reservation.fromJson(rows)).toList();
+  }
 }

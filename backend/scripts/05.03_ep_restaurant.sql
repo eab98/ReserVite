@@ -14,14 +14,19 @@ create or replace function get_matching_restaurants(filter varchar)
         description text,
         rating double precision,
         price_range int,
-        slot_duration int) as
+        slot_duration int,
+        latest_reservation timestamp) as
 $$
      declare substr varchar;
      begin
          perform auth.check_logged();
          substr = '%' || lower(filter) || '%';
          return query
-         select * from restaurants r where lower(r.name) like substr or lower(r.description) like substr or lower(r.city) like substr;
+         select distinct r.id, r.name, r.address, r.city, r.phone, r.description, r.rating, r.price_range, r.slot_duration, res.datetime
+         from restaurants r join reservations res on r.id = res.restaurant
+                  where lower(r.name) like substr or lower(r.description) like substr or lower(r.city) like substr
+                  and res.datetime > ALL(select resa.datetime from reservations resa where resa.restaurant = r.id and resa.client = auth.id())
+         order by res.datetime DESC;
      end;
 $$ language plpgsql security definer;
 
