@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:prbd_2526_a03/core/services/customer_services.dart';
 import 'package:prbd_2526_a03/core/services/reservation_services.dart';
+import 'package:prbd_2526_a03/models/customer.dart';
 import 'package:prbd_2526_a03/models/reservation.dart';
 
 import '../core/services/restaurant_services.dart';
@@ -11,25 +13,29 @@ class ManagerState {
   final Restaurant? currentRestaurant;
   final Reservation? currentReservation;
   final List<Reservation> reservations;
+  final Customer? currentCustomer;
 
   const ManagerState({
     this.restaurants = const [],
     this.reservations = const [],
     this.currentRestaurant,
-    this.currentReservation
+    this.currentReservation,
+    this.currentCustomer
   });
 
   ManagerState copyWith({
     List<Restaurant>? restaurants,
     List<Reservation>? reservations,
     Restaurant? currentRestaurant,
-    Reservation? currentReservation
+    Reservation? currentReservation,
+    Customer? currentCustomer
   }) {
     return ManagerState(
       restaurants: restaurants ?? this.restaurants,
       reservations: reservations ?? this.reservations,
       currentRestaurant: currentRestaurant ?? this.currentRestaurant,
-      currentReservation: currentReservation ?? this.currentReservation
+      currentReservation: currentReservation ?? this.currentReservation,
+      currentCustomer: currentCustomer ?? this.currentCustomer
     );
   }
 }
@@ -120,6 +126,20 @@ class ManagerStateNotifier extends AsyncNotifier<ManagerState> {
     if (previous == null) return;
 
     state = AsyncData(previous.copyWith(currentReservation: reservation));
+
+    try {
+      final customer = await CustomerServices.getUserByName(reservation.clientName!);
+
+      final current = state.value ?? previous;
+
+      state = AsyncData(
+        current.copyWith(
+            currentReservation: reservation,
+            currentCustomer: customer)
+      );
+    } catch (e, st) {
+      state = AsyncError(e, st);
+    }
   }
 
   Future<void> refreshReservationsForCurrentRestaurant() async {

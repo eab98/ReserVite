@@ -1,22 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:prbd_2526_a03/providers/manager_state_provider.dart';
-
-void main() async {
-  await initializeDateFormatting('fr_FR', null);
-  runApp(
-    MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
-      home: const ReservationDetailsManagerScreen(),
-    ),
-  );
-}
 
 class ReservationDetailsManagerScreen extends ConsumerWidget {
   const ReservationDetailsManagerScreen({super.key});
@@ -42,14 +27,19 @@ class ReservationDetailsManagerScreen extends ConsumerWidget {
         ),
         data: (managerState) {
           final reservation = managerState.currentReservation;
+          final customer = managerState.currentCustomer;
 
-          if (reservation == null) {
+          if (reservation == null || customer == null) {
             return const Scaffold(
               body: Center(
-                child: Text('Aucun restaurant sélectionné.'),
+                child: Text('Réservation ou client non sélectionnés.'),
               ),
             );
           }
+
+          final date = DateFormat('EEE dd/MM/yyyy', 'fr_FR')
+              .format(reservation.dateTime);
+          final time = DateFormat('HH:mm').format(reservation.dateTime);
 
           return Scaffold(
             appBar: AppBar(
@@ -116,24 +106,24 @@ class ReservationDetailsManagerScreen extends ConsumerWidget {
                               children: [
                                 Icon(Icons.person, size: 20),
                                 SizedBox(width: 8),
-                                Text('Nom: ${reservation.clientName}'),
+                                Text('Nom: ${customer.name}'),
                               ],
                             ),
                             const SizedBox(height: 8),
-                            const Row(
+                            Row(
                               children: [
                                 Icon(Icons.email, size: 20),
                                 SizedBox(width: 8),
-                                Text('Email: xapigeolet@epfc.eu'),
+                                Text('Email: ${customer.email}'),
                               ],
                             ),
                             const SizedBox(height: 8),
                             Row(
                               children: [
                                 const Icon(Icons.phone, size: 20),
-                                const SizedBox(width: 8),
+                                SizedBox(width: 8),
                                 Text(
-                                  'Téléphone: Non renseigné',
+                                  'Téléphone: ${customer.phoneNumber ?? 'Non renseigné'}',
                                   style: TextStyle(color: Colors.grey[600]),
                                 ),
                               ],
@@ -157,13 +147,13 @@ class ReservationDetailsManagerScreen extends ConsumerWidget {
                               ),
                             ),
                             const SizedBox(height: 8),
-                            const Row(
+                            Row(
                               children: [
                                 Icon(Icons.restaurant, size: 20),
                                 SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
-                                    'Le Gourmet',
+                                    reservation.restoName,
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -180,7 +170,7 @@ class ReservationDetailsManagerScreen extends ConsumerWidget {
                                 const Icon(Icons.calendar_today, size: 20),
                                 const SizedBox(width: 8),
                                 Text(
-                                  'Date: jeu. 21/11/2024',
+                                  'Date: $date',
                                 ),
                               ],
                             ),
@@ -189,7 +179,7 @@ class ReservationDetailsManagerScreen extends ConsumerWidget {
                               children: [
                                 const Icon(Icons.access_time, size: 20),
                                 const SizedBox(width: 8),
-                                const Text('Heure: 19:30'),
+                                Text('Heure: $time'),
                               ],
                             ),
                             const SizedBox(height: 8),
@@ -197,7 +187,7 @@ class ReservationDetailsManagerScreen extends ConsumerWidget {
                               children: [
                                 const Icon(Icons.people, size: 20),
                                 const SizedBox(width: 8),
-                                const Text('Nombre de convives: 8'),
+                                Text('Nombre de convives: ${reservation.numberOfGuests}'),
                               ],
                             ),
                             const SizedBox(height: 8),
@@ -207,8 +197,8 @@ class ReservationDetailsManagerScreen extends ConsumerWidget {
                                 const SizedBox(width: 8),
                                 const Text('Statut: '),
                                 Chip(
-                                  label: const Text(
-                                    'Confirmée',
+                                  label: Text(
+                                    reservation.status,
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: Colors.white,
@@ -231,7 +221,7 @@ class ReservationDetailsManagerScreen extends ConsumerWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Célébration',
+                              reservation.specialRequests ?? "Aucune",
                               style: TextStyle(color: Colors.grey[700]),
                             ),
                           ],
