@@ -53,7 +53,6 @@ class TablesService {
     );
 
     if (response.statusCode != 200 && response.statusCode != 204) {
-      print('${response.statusCode} ${response.body}');
       throw Exception('Failed to assign tables to reservation');
     }
   }

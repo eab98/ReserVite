@@ -81,14 +81,22 @@ begin
 --         raise exception 'Selected tables capacity is not sufficient';
 --     end if;
 
+
     delete from reservation_tables where reservation = reservation_id;
-
     insert into reservation_tables(reservation, "table") select reservation_id, unnest(table_ids);
-
     update reservations set status = 'confirmed'::status_type where id = reservation_id;
+
 end;
 $$ language plpgsql security definer;
 
 grant execute on function assign_tables_to_reservation(reservation_id int, guests int, table_ids int[]) to manager;
 
 -- select * from assign_tables_to_reservation(1, 2, array[1]);
+
+-- select r.id, r.number_of_guests, coalesce(sum(t.capacity), 0) as total_cap
+-- from reservations r
+--          left join reservation_tables rt on r.id = rt.reservation
+--          left join tables t on rt."table" = t.id
+-- where r.status in ('confirmed','completed')
+-- group by r.id, r.number_of_guests
+-- having r.number_of_guests > coalesce(sum(t.capacity), 0);

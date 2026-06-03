@@ -29,7 +29,7 @@ $$
         end if;
         return new;
     end;
-$$ language plpgsql;
+$$ language plpgsql security definer ;
 
 create or replace function check_no_tables() returns trigger as
 $$
@@ -39,7 +39,7 @@ $$
         end if;
         return new;
     end;
-$$ language plpgsql;
+$$ language plpgsql security definer ;
 
 create constraint trigger check_not_pending_or_cancelled
 after insert or update
