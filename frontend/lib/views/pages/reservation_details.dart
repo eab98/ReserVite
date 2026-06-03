@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:prbd_2526_a03/core/services/reservation_services.dart';
+import 'package:prbd_2526_a03/providers/reference_time_provider.dart';
 import 'package:prbd_2526_a03/views/pages/add_reservation.dart';
 
 import '../../providers/client_state_provider.dart';
+import '../widgets/time_travel_widget.dart';
 
 class ReservationDetailsScreen extends ConsumerStatefulWidget {
   final int id;
@@ -24,7 +26,6 @@ class _ReservationDetailsScreen extends ConsumerState<ReservationDetailsScreen> 
     final notifier = ref.read(clientStateProvider.notifier);
 
     final theme = Theme.of(context);
-    final simulatedTime = DateTime(2024, 12, 4, 16, 0);
 
     return Scaffold(
       appBar: AppBar(
@@ -51,19 +52,7 @@ class _ReservationDetailsScreen extends ConsumerState<ReservationDetailsScreen> 
           child: SafeArea(
             child: Padding(
               padding: const EdgeInsets.only(top: 2.0),
-              child: Tooltip(
-                message:
-                'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
-                child: Text(
-                  DateFormat('EEEE dd/MM/yyyy HH:mm', 'fr_FR')
-                      .format(simulatedTime),
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: Colors.grey[400],
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
-              ),
+              child: TimeTravelWidget(),
             ),
           ),
         ),
@@ -79,7 +68,7 @@ class _ReservationDetailsScreen extends ConsumerState<ReservationDetailsScreen> 
               }
               return details.when(
                   data: (r)  {
-                  final referenceTime = DateTime(2024, 12, 4, 16, 0);
+                  final referenceTime = ref.watch(referenceTimeProvider);
                   final isPast = !r.dateTime.isAfter(referenceTime);
                   final canEdit = r.status != 'completed'
                       && r.status != 'cancelled'
