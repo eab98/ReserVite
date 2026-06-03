@@ -18,7 +18,6 @@ class ManagerRestaurantCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(managerStateProvider);
     final notifier = ref.read(managerStateProvider.notifier);
     String currencyLogo = '';
     if (restaurant.priceRange != null) {
@@ -86,7 +85,7 @@ class ManagerRestaurantCard extends ConsumerWidget {
         ),
         trailing: const Icon(Icons.chevron_right),
         onTap: () async {
-          // await notifier.selectRestaurant(restaurant);
+          await notifier.selectRestaurant(restaurant);
           if (context.mounted) {
             Navigator.pushNamed(context, '/restaurant_management_reservations');
           }
