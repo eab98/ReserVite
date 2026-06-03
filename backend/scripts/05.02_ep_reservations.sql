@@ -352,3 +352,11 @@ $$
 $$ language plpgsql security definer;
 
 grant execute on function get_all_reservations_for_restaurant(restaurant_id int) to manager;
+
+create or replace function complete_reservation(_resa_id int) returns void as
+    $$
+    begin
+        update reservations set status='completed' where reservations.id = _resa_id;
+    end;
+    $$language plpgsql security definer ;
+grant execute on function complete_reservation to manager;
