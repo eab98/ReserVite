@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:prbd_2526_a03/providers/manager_state_provider.dart';
+import 'package:prbd_2526_a03/providers/reference_time_provider.dart';
 import 'package:prbd_2526_a03/views/widgets/reservation_tables_card.dart';
 import 'package:prbd_2526_a03/views/widgets/time_travel_widget.dart';
 
@@ -40,6 +41,10 @@ class ReservationDetailsManagerScreen extends ConsumerWidget {
               ),
             );
           }
+
+
+          final referenceTime = ref.watch(referenceTimeProvider);
+          final canComplete = !reservation.dateTime.isAfter(referenceTime);
 
           final date = DateFormat('EEE dd/MM/yyyy', 'fr_FR')
               .format(reservation.dateTime);
@@ -216,10 +221,18 @@ class ReservationDetailsManagerScreen extends ConsumerWidget {
                       if (reservation.status == 'confirmed') ...[
                         const SizedBox(height: 24),
                         ElevatedButton.icon(
-                          onPressed: () {},
+                          onPressed: canComplete ? () => _confirmComplete(context, ref, reservation.id) : null,
                           icon: const Icon(Icons.check_circle),
                           label: const Text('Marquer comme terminée'),
                         ),
+                        if(!canComplete)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: Text(
+                              'La réservation ne peut être terminée que durant son service ou après celui-ci.',
+                              style: TextStyle(fontSize: 12, color: Colors.red[600]),
+                            ),
+                          ),
                       ],
 
                       if (reservation.status == 'pending') ...[
@@ -324,5 +337,39 @@ class ReservationDetailsManagerScreen extends ConsumerWidget {
       default:
         return const Icon(Icons.help);
     }
+  }
+  Future<void> _confirmComplete(BuildContext context, WidgetRef ref, int resaId) async{
+    final agreed = await showDialog<bool>(
+      context: context,
+      builder: (context) =>
+          AlertDialog(
+            title: const Text('Terminer la réservation'),
+            content: const Text(
+                'Voulez-vous marquer cette réservation comme terminée?'),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(context, false),
+                  child: const Text('Non')),
+              TextButton(onPressed: () => Navigator.pop(context, true),
+                  child: const Text('Oui')),
+            ],
+          ),
+    );
+
+    if(agreed!= true) return;
+
+    await ReservationServices.completeReservation(resaId);
+    if(!context.mounted) return;
+
+    final notifier = ref.read(managerStateProvider.notifier);
+    await notifier.refreshReservationsForCurrentRestaurant();
+    await notifier.refreshRestaurants();
+
+    final list = ref.read(managerStateProvider).value!.reservations;
+    await notifier.selectReservation(list.firstWhere((r) => r.id == resaId));
+
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Réservation marquée comme terminée'), backgroundColor: Colors.black),
+    );
   }
 }
