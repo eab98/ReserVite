@@ -9,6 +9,7 @@ import 'package:prbd_2526_a03/models/reservation.dart';
 import 'package:prbd_2526_a03/models/restaurant.dart';
 import 'package:prbd_2526_a03/models/services.dart';
 import 'package:prbd_2526_a03/providers/current_user_provider.dart';
+import 'package:prbd_2526_a03/providers/reference_time_provider.dart';
 
 class ClientState {
   final List<Reservation> reservations;
@@ -158,7 +159,8 @@ class ClientStateNotifier extends AsyncNotifier<ClientState>{
     //prendre l'état précédent et en faire une copie avec seulement ces attributs là qui ont changé
     state = AsyncLoading();
 
-    DateTime day = DateTime(2024, 12, 4);
+    final referenceTime = ref.read(referenceTimeProvider);
+    DateTime day = DateTime(referenceTime.year, referenceTime.month, referenceTime.day);
 
     // DateTime(
     //     DateTime.now().year, DateTime.now().month, DateTime.now().day);
