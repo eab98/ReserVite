@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../providers/manager_state_provider.dart';
 
-class RestaurantManagementReservationsScreen extends StatelessWidget {
+
+class RestaurantManagementReservationsScreen extends ConsumerWidget {
   const RestaurantManagementReservationsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(managerStateProvider);
+    final notifier = ref.read(managerStateProvider.notifier);
     final theme = Theme.of(context);
     final simulatedTime = DateTime(2024, 12, 4, 16, 0);
 
@@ -14,7 +19,7 @@ class RestaurantManagementReservationsScreen extends StatelessWidget {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () {},
+          onPressed: () => Navigator.pop(context),
         ),
         title: const Text('Le Gourmet'),
         automaticallyImplyLeading: false,
@@ -22,7 +27,7 @@ class RestaurantManagementReservationsScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: 'Rafraîchir les données',
-            onPressed: () {},
+            onPressed: () => notifier.refreshReservationsForCurrentRestaurant(),
           ),
         ],
         elevation: 2,

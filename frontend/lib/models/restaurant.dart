@@ -36,7 +36,9 @@ class Restaurant {
         rating: json['rating'],
         priceRange: json['price_range'],
         slotDuration: json['slot_duration'],
-        latestReservation: DateTime.parse(json['latest_reservation']),
+        latestReservation: json['latest_reservation'] == null
+            ? null
+            : DateTime.parse(json['latest_reservation']),
         pendingRequests: json['pending_requests']);
   }
 }
