@@ -1,8 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:prbd_2526_a03/core/services/customer_services.dart';
 import 'package:prbd_2526_a03/core/services/reservation_services.dart';
+import 'package:prbd_2526_a03/core/services/tables_service.dart';
 import 'package:prbd_2526_a03/models/customer.dart';
 import 'package:prbd_2526_a03/models/reservation.dart';
+import 'package:prbd_2526_a03/models/tables.dart';
 
 import '../core/services/restaurant_services.dart';
 import '../models/restaurant.dart';
@@ -14,13 +16,15 @@ class ManagerState {
   final Reservation? currentReservation;
   final List<Reservation> reservations;
   final Customer? currentCustomer;
+  final List<Tables> currentTables;
 
   const ManagerState({
     this.restaurants = const [],
     this.reservations = const [],
     this.currentRestaurant,
     this.currentReservation,
-    this.currentCustomer
+    this.currentCustomer,
+    this.currentTables = const []
   });
 
   ManagerState copyWith({
@@ -28,14 +32,16 @@ class ManagerState {
     List<Reservation>? reservations,
     Restaurant? currentRestaurant,
     Reservation? currentReservation,
-    Customer? currentCustomer
+    Customer? currentCustomer,
+    List<Tables>? currentTables
   }) {
     return ManagerState(
       restaurants: restaurants ?? this.restaurants,
       reservations: reservations ?? this.reservations,
       currentRestaurant: currentRestaurant ?? this.currentRestaurant,
       currentReservation: currentReservation ?? this.currentReservation,
-      currentCustomer: currentCustomer ?? this.currentCustomer
+      currentCustomer: currentCustomer ?? this.currentCustomer,
+      currentTables: currentTables ?? this.currentTables
     );
   }
 }
@@ -129,13 +135,40 @@ class ManagerStateNotifier extends AsyncNotifier<ManagerState> {
 
     try {
       final customer = await CustomerServices.getUserByName(reservation.clientName!);
+      final tables = await TablesService.getTablesForReservation(reservation.id);
 
       final current = state.value ?? previous;
 
       state = AsyncData(
         current.copyWith(
             currentReservation: reservation,
-            currentCustomer: customer)
+            currentCustomer: customer,
+            currentTables: tables)
+      );
+    } catch (e, st) {
+      state = AsyncError(e, st);
+    }
+  }
+
+  Future<void> refreshReservationDetails() async {
+    final previous = state.value;
+    if (previous == null) return;
+
+    final reservation = previous.currentReservation;
+
+    if (reservation == null) return;
+
+    try {
+      final customer = await CustomerServices.getUserByName(reservation.clientName!);
+      final tables = await TablesService.getTablesForReservation(reservation.id);
+
+      final current = state.value ?? previous;
+
+      state = AsyncData(
+          current.copyWith(
+              currentReservation: reservation,
+              currentCustomer: customer,
+              currentTables: tables)
       );
     } catch (e, st) {
       state = AsyncError(e, st);

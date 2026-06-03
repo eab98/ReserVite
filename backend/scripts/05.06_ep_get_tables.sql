@@ -14,7 +14,7 @@ $$
     begin
         perform auth.check_logged();
         return query
-        select * from tables where restaurant = reservation_id;
+        select t.id, t.restaurant, t.table_number, t.capacity from tables t join reservation_tables rt on t.id = rt."table" where rt.reservation = reservation_id;
     end;
 $$ language plpgsql security definer;
 

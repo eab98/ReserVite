@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:prbd_2526_a03/providers/manager_state_provider.dart';
+import 'package:prbd_2526_a03/views/widgets/reservation_tables_card.dart';
 
 class ReservationDetailsManagerScreen extends ConsumerWidget {
   const ReservationDetailsManagerScreen({super.key});
@@ -28,6 +29,7 @@ class ReservationDetailsManagerScreen extends ConsumerWidget {
         data: (managerState) {
           final reservation = managerState.currentReservation;
           final customer = managerState.currentCustomer;
+          final tables = managerState.currentTables;
 
           if (reservation == null || customer == null) {
             return const Scaffold(
@@ -53,7 +55,7 @@ class ReservationDetailsManagerScreen extends ConsumerWidget {
                 IconButton(
                   icon: const Icon(Icons.refresh),
                   tooltip: 'Rafraîchir les données',
-                  onPressed: () {},
+                  onPressed: () => notifier.refreshReservationDetails(),
                 ),
               ],
               elevation: 2,
@@ -229,51 +231,7 @@ class ReservationDetailsManagerScreen extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    const Text(
-                      'Tables assignées',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 8.0),
-                              child: Row(
-                                children: [
-                                  const Icon(Icons.table_restaurant, size: 20),
-                                  const SizedBox(width: 8),
-                                  const Text('Table 2'),
-                                  const SizedBox(width: 16),
-                                  Text(
-                                    '(4 places)',
-                                    style: TextStyle(color: Colors.grey[600]),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Row(
-                              children: [
-                                const Icon(Icons.table_restaurant, size: 20),
-                                const SizedBox(width: 8),
-                                const Text('Table 3'),
-                                const SizedBox(width: 16),
-                                Text(
-                                  '(6 places)',
-                                  style: TextStyle(color: Colors.grey[600]),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                    ReservationTablesCard(tables: tables),
                     const SizedBox(height: 24),
                     ElevatedButton.icon(
                       onPressed: () {},
