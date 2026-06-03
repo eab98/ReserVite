@@ -60,7 +60,8 @@ AsyncNotifierProvider<ManagerStateNotifier, ManagerState>(
 class ManagerStateNotifier extends AsyncNotifier<ManagerState> {
   @override
   Future<ManagerState> build() async {
-    ref.watch(simulatedTimeProvider);
+    final referenceTime = ref.read(referenceTimeProvider);
+    DateTime day = DateTime(referenceTime.year, referenceTime.month, referenceTime.day);
     final user = await ref.watch(currentUserProvider.future);
 
     if (user == null) {
