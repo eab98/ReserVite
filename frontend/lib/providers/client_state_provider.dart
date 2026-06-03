@@ -9,6 +9,7 @@ import 'package:prbd_2526_a03/models/reservation.dart';
 import 'package:prbd_2526_a03/models/restaurant.dart';
 import 'package:prbd_2526_a03/models/services.dart';
 import 'package:prbd_2526_a03/providers/current_user_provider.dart';
+import 'package:prbd_2526_a03/providers/reference_time_provider.dart';
 
 class ClientState {
   final List<Reservation> reservations;
@@ -150,7 +151,7 @@ class ClientStateNotifier extends AsyncNotifier<ClientState>{
     }
   }
 
-  Future<void> loadFirstAvailableSlots(int restaurantId, int numberOfGuests) async {
+  Future<void> loadFirstAvailableSlots(int restaurantId, int numberOfGuests, [int? excluded]) async {
     final previous = state.value;
     //si jamais on appelle cette methode avant le build et que le state est null
     if (previous == null) return;
@@ -158,7 +159,8 @@ class ClientStateNotifier extends AsyncNotifier<ClientState>{
     //prendre l'état précédent et en faire une copie avec seulement ces attributs là qui ont changé
     state = AsyncLoading();
 
-    DateTime day = DateTime(2024, 12, 4);
+    final referenceTime = ref.read(referenceTimeProvider);
+    DateTime day = DateTime(referenceTime.year, referenceTime.month, referenceTime.day);
 
     // DateTime(
     //     DateTime.now().year, DateTime.now().month, DateTime.now().day);
@@ -166,7 +168,7 @@ class ClientStateNotifier extends AsyncNotifier<ClientState>{
 
     try {
       for(int i = 0; i < maxDays; i++){
-        final slots = await ReservationServices.getAvailableSlotsForDate(restaurantId, day, numberOfGuests);
+        final slots = await ReservationServices.getAvailableSlotsForDate(restaurantId, day, numberOfGuests, excluded);
         print('day=$day slots=${slots.length}');
         if(slots.isNotEmpty) {
           state = AsyncData(previous.copyWith(
@@ -191,14 +193,14 @@ class ClientStateNotifier extends AsyncNotifier<ClientState>{
 
   }
 
-  Future<void> loadSlotsPerDay(int restaurantId, DateTime date,int numberOfGuests) async {
+  Future<void> loadSlotsPerDay(int restaurantId, DateTime date,int numberOfGuests, [int? excluded]) async {
     final previous = state.value;
     if (previous == null) return;
 
     state = AsyncLoading();
 
     try {
-      final slots = await ReservationServices.getAvailableSlotsForDate(restaurantId, date, numberOfGuests);
+      final slots = await ReservationServices.getAvailableSlotsForDate(restaurantId, date, numberOfGuests, excluded);
 
       if(slots.isNotEmpty){
         state = AsyncData(previous.copyWith(

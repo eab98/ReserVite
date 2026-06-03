@@ -7,6 +7,7 @@ import 'package:prbd_2526_a03/views/pages/reservation_details.dart';
 
 import '../../providers/client_state_provider.dart';
 import '../../providers/current_user_provider.dart';
+import '../widgets/time_travel_widget.dart';
 
 class MyReservationsScreen extends ConsumerStatefulWidget {
   const MyReservationsScreen({super.key});
@@ -61,17 +62,7 @@ class _MyReservationsScreen extends ConsumerState<MyReservationsScreen> {
           child: SafeArea(
             child: Padding(
               padding: const EdgeInsets.only(top: 2.0),
-              child: Tooltip(
-                message: 'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
-                child: Text(
-                  'mercredi 04/12/2024 16:00',
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: Colors.grey[400],
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
-              ),
+              child: TimeTravelWidget(),
             ),
           ),
         ),

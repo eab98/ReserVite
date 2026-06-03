@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../models/reservation.dart';
 import '../../providers/manager_state_provider.dart';
 import '../widgets/reservation_card.dart';
+import '../widgets/time_travel_widget.dart';
 
 class RestaurantManagementReservationsScreen extends ConsumerStatefulWidget {
   const RestaurantManagementReservationsScreen({super.key});
@@ -77,19 +78,7 @@ class _RestaurantManagementReservationsScreenState
               child: SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.only(top: 2.0),
-                  child: Tooltip(
-                    message:
-                    'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
-                    child: Text(
-                      DateFormat('EEEE dd/MM/yyyy HH:mm', 'fr_FR')
-                          .format(simulatedTime),
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: Colors.grey[400],
-                        fontWeight: FontWeight.normal,
-                      ),
-                    ),
-                  ),
+                  child: TimeTravelWidget(),
                 ),
               ),
             ),
