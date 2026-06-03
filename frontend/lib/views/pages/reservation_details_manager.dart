@@ -55,7 +55,7 @@ class ReservationDetailsManagerScreen extends ConsumerWidget {
                 IconButton(
                   icon: const Icon(Icons.refresh),
                   tooltip: 'Rafraîchir les données',
-                  onPressed: () {},
+                  onPressed: () => notifier.refreshReservationDetails(),
                 ),
               ],
               elevation: 2,

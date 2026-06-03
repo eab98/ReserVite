@@ -150,6 +150,31 @@ class ManagerStateNotifier extends AsyncNotifier<ManagerState> {
     }
   }
 
+  Future<void> refreshReservationDetails() async {
+    final previous = state.value;
+    if (previous == null) return;
+
+    final reservation = previous.currentReservation;
+
+    if (reservation == null) return;
+
+    try {
+      final customer = await CustomerServices.getUserByName(reservation.clientName!);
+      final tables = await TablesService.getTablesForReservation(reservation.id);
+
+      final current = state.value ?? previous;
+
+      state = AsyncData(
+          current.copyWith(
+              currentReservation: reservation,
+              currentCustomer: customer,
+              currentTables: tables)
+      );
+    } catch (e, st) {
+      state = AsyncError(e, st);
+    }
+  }
+
   Future<void> refreshReservationsForCurrentRestaurant() async {
     final previous = state.value;
 
