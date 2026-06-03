@@ -65,3 +65,30 @@ $$
 $$ language plpgsql security definer;
 
 grant execute on function get_all_available_tables(reservation_id int) to manager;
+
+create or replace function assign_tables_to_reservation(reservation_id int, guests int, table_ids int[])
+    returns void as
+$$
+declare
+    total_capacity int;
+begin
+
+    perform auth.check_logged();
+
+--     select coalesce(sum(t.capacity), 0) into total_capacity from tables t join reservations r
+--                                                                 on r.restaurant = t.restaurant where r.id = reservation_id and t.id = any(table_ids);
+--     if total_capacity < guests then
+--         raise exception 'Selected tables capacity is not sufficient';
+--     end if;
+
+    delete from reservation_tables where reservation = reservation_id;
+
+    insert into reservation_tables(reservation, "table") select reservation_id, unnest(table_ids);
+
+    update reservations set status = 'confirmed'::status_type where id = reservation_id;
+end;
+$$ language plpgsql security definer;
+
+grant execute on function assign_tables_to_reservation(reservation_id int, guests int, table_ids int[]) to manager;
+
+-- select * from assign_tables_to_reservation(1, 2, array[1]);

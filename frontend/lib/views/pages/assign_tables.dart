@@ -202,7 +202,26 @@ class _AssignTablesScreenState extends ConsumerState<AssignTablesScreen> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: hasEnoughCapacity
-                          ? () {} : null,
+                          ? () async {
+                        try {
+                          await notifier.assignTablesToCurrentReservation(_selectedTableIds.toList());
+
+                          if (!context.mounted) return;
+
+                          Navigator.popUntil(
+                            context,
+                            ModalRoute.withName('/restaurant_management_reservations'),
+                          );
+                        } catch (e) {
+                          if (!context.mounted) return;
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(e.toString()),
+                            ),
+                          );
+                        }
+                      } : null,
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
