@@ -223,7 +223,7 @@ class ReservationDetailsManagerScreen extends ConsumerWidget {
                       if (reservation.status == 'pending') ...[
                         const SizedBox(height: 24),
                         ElevatedButton.icon(
-                          onPressed: () {},
+                          onPressed: () => Navigator.pushNamed(context, '/assign_tables'),
                           icon: const Icon(Icons.table_restaurant),
                           label: const Text('Confirmer et assigner tables'),
                         ),
