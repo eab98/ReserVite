@@ -213,12 +213,23 @@ class ReservationDetailsManagerScreen extends ConsumerWidget {
                     const SizedBox(height: 16),
                     ReservationTablesCard(tables: tables),
                     if (reservation.status != 'completed' && reservation.status != 'cancelled') ...[
+                      if (reservation.status == 'confirmed') ...[
                         const SizedBox(height: 24),
                         ElevatedButton.icon(
                           onPressed: () {},
                           icon: const Icon(Icons.check_circle),
                           label: const Text('Marquer comme terminée'),
                         ),
+                      ],
+
+                      if (reservation.status == 'pending') ...[
+                        const SizedBox(height: 24),
+                        ElevatedButton.icon(
+                          onPressed: () => Navigator.pushNamed(context, '/assign_tables'),
+                          icon: const Icon(Icons.table_restaurant),
+                          label: const Text('Confirmer et assigner tables'),
+                        ),
+                      ],
                         const SizedBox(height: 8),
                         OutlinedButton.icon(
                           onPressed: () => _confirmCancel(context, ref, reservation.id),
