@@ -8,6 +8,7 @@ class Reservation {
   final String? restoPhone;
   final String? restoAddress;
   final String? specialRequests;
+  final int? restoId;
 
   const Reservation({
     required this.id,
@@ -18,7 +19,8 @@ class Reservation {
     required this.numberOfGuests,
     this.restoAddress,
     this.restoPhone,
-    this.specialRequests
+    this.specialRequests,
+    this.restoId
 
 
   });
@@ -33,7 +35,8 @@ class Reservation {
         numberOfGuests: json['number_of_guests'],
         restoAddress : json['address'],
         restoPhone : json['phone'],
-      specialRequests: json['special_request']
+      specialRequests: json['special_request'],
+      restoId: json['resto_id']
     );
   }
 

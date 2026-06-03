@@ -11,12 +11,13 @@ create or replace function get_my_reservations()
         status status_type,
         city varchar,
         datetime timestamp,
-        number_of_guests int) as
+        number_of_guests int,
+         resto_id int) as
     $$
     begin
         perform auth.check_logged();
         return query
-        select resa.id, resto.name, resa.status, resto.city, resa.datetime, resa.number_of_guests
+        select resa.id, resto.name, resa.status, resto.city, resa.datetime, resa.number_of_guests, resto.id
         from reservations resa, restaurants resto
         where resa.restaurant = resto.id and resa.client = auth.id()
         order by resa.datetime DESC ;
@@ -38,12 +39,13 @@ create or replace function get_reservation_details(_id int)
        datetime timestamp,
        number_of_guests int,
        phone varchar,
-       special_request text) as
+       special_request text,
+       resto_id int) as
     $$
     begin
         perform auth.check_logged();
         return query
-        select resa.id, resto.name, resa.status, resto.address, resto.city, resa.datetime, resa.number_of_guests, resto.phone, resa.special_requests
+        select resa.id, resto.name, resa.status, resto.address, resto.city, resa.datetime, resa.number_of_guests, resto.phone, resa.special_requests, resto.id
         from reservations resa, restaurants resto
         where resa.restaurant = resto.id and resa.id = _id;
     end;

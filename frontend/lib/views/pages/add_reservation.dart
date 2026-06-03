@@ -12,7 +12,9 @@ import '../../providers/client_state_provider.dart';
 
 
 class NewReservationScreen extends ConsumerStatefulWidget {
-  const NewReservationScreen({super.key});
+  final int? resaId;
+  const NewReservationScreen({super.key, this.resaId});
+
 
   @override
   ConsumerState<NewReservationScreen> createState() => _NewReservationScreen();
@@ -27,6 +29,11 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
 
   final _specialRequestController = TextEditingController();
 
+  bool get isEdit => widget.resaId != null;
+
+  int? _restaurantId;
+  String _restaurantName = '';
+
   @override
   void dispose() {
     _specialRequestController.dispose();
@@ -37,15 +44,46 @@ class _NewReservationScreen extends ConsumerState<NewReservationScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
-      final restaurant = ref
-          .read(clientStateProvider)
-          .value
-          ?.currentRestaurant;
-      if (restaurant != null) {
-        ref.read(clientStateProvider.notifier)
-            .loadFirstAvailableSlots(restaurant.id, numberOfGuests);
+    Future.microtask(() async {
+
+
+      final notifier = ref.read(clientStateProvider.notifier);
+      //pré-remplissage des fields à l'ouverture de la page en mode edit
+
+      if(isEdit){
+        await notifier.loadReservationDetails(widget.resaId!);
+        final details = ref.read(clientStateProvider).value?.currentReservationDetails?.value;
+        if(details == null) return;
+
+        setState(() {
+          selectedDate = details.dateTime;
+          selectedSlot = details.dateTime;
+          numberOfGuests = details.numberOfGuests;
+          _specialRequestController.text = details.specialRequests ?? '';
+        });
+
+        if(details.restoId != null){
+          //on appelle la methode en dehors du setstate car setstate se charge des champs locaux, loadslotsperday met a jour le state du provider donc non local
+          notifier.loadSlotsPerDay(details.restoId!, details.dateTime, numberOfGuests);
+
+          _restaurantId = details.restoId;
+          _restaurantName = details.name;
+        }
+
+
+      } else {
+        //si on crée, rien a prefill, pas de resaId
+        final restaurant = ref.read(clientStateProvider).value?.currentRestaurant;
+        if(restaurant!=null){
+          notifier.loadFirstAvailableSlots(restaurant.id, numberOfGuests);
+          _restaurantId = restaurant.id;
+          _restaurantName = restaurant.name;
+        }
+
+
       }
+
+
     });
   }
 
