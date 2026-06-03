@@ -155,4 +155,15 @@ class ReservationServices {
     final List<dynamic> rows = body;
     return rows.map((rows) => Reservation.fromJson(rows)).toList();
   }
+
+  static Future<void> completeReservation(int resaID) async {
+    final response = await ApiClient.post(
+      'complete_reservation',
+      body : json.encode({'_resa_id' : resaID})
+    );
+
+    if(response.statusCode != 200 && response.statusCode != 204){
+      throw Exception('Failed to complete reservation');
+    }
+  }
 }
