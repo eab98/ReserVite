@@ -9,23 +9,27 @@ import 'current_user_provider.dart';
 class ManagerState {
   final List<Restaurant> restaurants;
   final Restaurant? currentRestaurant;
+  final Reservation? currentReservation;
   final List<Reservation> reservations;
 
   const ManagerState({
     this.restaurants = const [],
     this.reservations = const [],
     this.currentRestaurant,
+    this.currentReservation
   });
 
   ManagerState copyWith({
     List<Restaurant>? restaurants,
     List<Reservation>? reservations,
     Restaurant? currentRestaurant,
+    Reservation? currentReservation
   }) {
     return ManagerState(
       restaurants: restaurants ?? this.restaurants,
       reservations: reservations ?? this.reservations,
       currentRestaurant: currentRestaurant ?? this.currentRestaurant,
+      currentReservation: currentReservation ?? this.currentReservation
     );
   }
 }
@@ -108,6 +112,14 @@ class ManagerStateNotifier extends AsyncNotifier<ManagerState> {
     } catch (e, st) {
       state = AsyncError(e, st);
     }
+  }
+
+  Future<void> selectReservation(Reservation reservation) async {
+    final previous = state.value;
+
+    if (previous == null) return;
+
+    state = AsyncData(previous.copyWith(currentReservation: reservation));
   }
 
   Future<void> refreshReservationsForCurrentRestaurant() async {

@@ -320,10 +320,10 @@ grant execute on function cancel_reservation(int) to authenticated;
 -- select status from reservations where id = 13;
 -- select auth.logout_for_test();
 
-select auth.login_for_test('brlacroix@epfc.eu');
-select cancel_reservation(13);
-select status from reservations where id = 13;
-select auth.logout_for_test();
+-- select auth.login_for_test('brlacroix@epfc.eu');
+-- select cancel_reservation(13);
+-- select status from reservations where id = 13;
+-- select auth.logout_for_test();
 
 create or replace function get_all_reservations_for_restaurant(restaurant_id int)
 returns table(

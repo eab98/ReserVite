@@ -198,10 +198,13 @@ class _RestaurantManagementReservationsScreenState
       clientName: reservation.clientName ?? 'Client inconnu',
       nameResto: reservation.restoName,
       cardIcon: Icons.restaurant,
-      onTap: () {
-        Navigator.pushNamed(
-          context,
-          '/reservation_details_manager');
+      onTap: () async {
+        await ref.read(managerStateProvider.notifier).selectReservation(reservation);
+        if (context.mounted) {
+          Navigator.pushNamed(
+              context,
+              '/reservation_details_manager');
+        }
       },
     );
   }
