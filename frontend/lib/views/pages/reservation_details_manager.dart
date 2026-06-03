@@ -216,7 +216,7 @@ class ReservationDetailsManagerScreen extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    ReservationTablesCard(tables: tables),
+                    ReservationTablesCard(tables: tables, reservation: reservation),
                     if (reservation.status != 'completed' && reservation.status != 'cancelled') ...[
                       if (reservation.status == 'confirmed') ...[
                         const SizedBox(height: 24),

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:prbd_2526_a03/models/reservation.dart';
 import 'package:prbd_2526_a03/models/tables.dart';
 
 class ReservationTablesCard extends StatelessWidget {
   final List<Tables>? tables;
+  final Reservation reservation;
 
   const ReservationTablesCard({
     super.key,
     required this.tables,
+    required this.reservation
   });
 
   @override
@@ -77,7 +80,7 @@ class ReservationTablesCard extends StatelessWidget {
         const SizedBox(width: 8),
         Expanded(
           child: Text(
-            "Aucune table assignée (en attente de confirmation)",
+            "Aucune table assignée ${reservation.status == 'pending' ? '(en attente de confirmation)' : ''}",
             style: TextStyle(
               color: Colors.grey[600],
             ),

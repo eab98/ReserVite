@@ -30,5 +30,5 @@ create or replace function save_simulated_time(_timestamp timestamp) returns voi
     $$language plpgsql security definer ;
 
 grant execute on function save_simulated_time(timestamp) to authenticated;
-grant execute on function get_simulated_time to anon;
+grant execute on function save_simulated_time to anon;
 
