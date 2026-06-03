@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:prbd_2526_a03/core/services/reservation_services.dart';
+import 'package:prbd_2526_a03/views/pages/add_reservation.dart';
 
 import '../../providers/client_state_provider.dart';
 
@@ -189,7 +190,7 @@ class _ReservationDetailsScreen extends ConsumerState<ReservationDetailsScreen> 
                         children: [
                           Expanded(
                             child: ElevatedButton.icon(
-                              onPressed: () {},
+                              onPressed: (r.status == 'completed' || r.status == 'cancelled') ? null : () => Navigator.push(context, MaterialPageRoute(builder: (_) => NewReservationScreen(resaId: r.id))),
                               icon: const Icon(Icons.edit),
                               label: const Text('Modifier'),
                             ),
