@@ -51,4 +51,21 @@ class RestaurantServices {
     final List<dynamic> rows = body;
     return rows.map((rows) => Restaurant.fromJson(rows)).toList();
   }
+
+  static Future<int> getPendingCount(int restoId) async {
+    final response = await ApiClient.post(
+      'get_pending_count_per_restaurant',
+      body : json.encode({'_resto_id' : restoId}),
+    );
+
+    if(response.statusCode != 200){
+      throw Exception('Failed to get the count');
+    }
+
+    final dynamic body = json.decode(response.body);
+    if (body is int) return body;
+    if (body is String) return int.parse(body);
+    return 0;
+  }
+
 }
