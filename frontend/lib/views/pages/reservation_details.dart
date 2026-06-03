@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:prbd_2526_a03/core/services/reservation_services.dart';
 
 import '../../providers/client_state_provider.dart';
 
@@ -196,7 +197,7 @@ class _ReservationDetailsScreen extends ConsumerState<ReservationDetailsScreen> 
                           const SizedBox(width: 8),
                           Expanded(
                             child: OutlinedButton.icon(
-                              onPressed: () {},
+                              onPressed: (r.status == 'completed' || r.status == 'cancelled') ? null : () => _confirmCancel(r.id),
                               icon: const Icon(Icons.cancel),
                               label: const Text('Annuler'),
                             ),
@@ -256,5 +257,34 @@ class _ReservationDetailsScreen extends ConsumerState<ReservationDetailsScreen> 
       default:
         return const Icon(Icons.help);
     }
+  }
+
+  Future<void> _confirmCancel(int resaId) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Annuler la réservation'),
+        content: const Text('Êtes-vous sûr de vouloir annuler cette réservation?'),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Non')),
+          TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              child: const Text('Oui')),
+        ]
+      )
+    );
+
+    if(confirmed != true) return;
+
+    //si confirmé
+
+    await ReservationServices.cancelReservation(resaId);
+    if(!mounted) return;
+    ref.read(clientStateProvider.notifier).loadReservationDetails(resaId);
+    ref.read(clientStateProvider.notifier).refresh();
+
   }
 }

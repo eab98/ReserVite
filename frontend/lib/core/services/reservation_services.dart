@@ -108,4 +108,30 @@ class ReservationServices {
     return body is int ? body : body.first.values.first as int;
 
   }
+
+  static Future<bool> canCancel(int resaId) async {
+    final response = await ApiClient.post(
+      'can_cancel',
+      body : json.encode({'_resa_id' : resaId})
+    );
+    if(response.statusCode != 200){
+      throw Exception('Failed to check');
+    }
+
+    final dynamic body = json.decode(response.body);
+
+    return body is bool ? body : body.first.values.first as bool;
+  }
+
+  static Future<void> cancelReservation(int resaId) async {
+    final response = await ApiClient.post(
+        'cancel_reservation',
+        body : json.encode({'_resa_id' : resaId})
+    );
+
+    if(response.statusCode != 200 && response.statusCode != 204){
+      // print('CANCEL FAILED: ${response.statusCode} ${response.body}');
+      throw Exception('Failed to cancel the reservation');
+    }
+  }
 }

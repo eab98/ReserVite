@@ -272,7 +272,7 @@ create or replace function save_reservation(
                                     restaurant=_restaurant,
                                     datetime = _date,
                                     number_of_guests = _number_of_guests,
-                                    status = _status,
+                                    status = _status::status_type,
                                     special_requests = _special_request
             where reservations.id = _id;
             return _id;
@@ -284,3 +284,43 @@ grant execute on function save_reservation to authenticated;
 /*select auth.login_for_test('brlacroix@epfc.eu');
 select save_reservation(3, '2024-12-04 19:00:00', 2, 'pending');
 select auth.logout_for_test();*/
+
+create or replace function can_cancel( _resa_id int) returns bool as
+    $$
+    declare
+        _status text;
+    begin
+        select reservations.status into _status
+            from reservations
+            where reservations.id=_resa_id ;
+
+        return _status not in ('completed', 'cancelled');
+    end;
+    $$language plpgsql security definer ;
+grant execute on function can_cancel(int) to authenticated;
+
+create or replace function cancel_reservation(_resa_id int) returns void as
+    $$
+    begin
+        if can_cancel(_resa_id) then
+            /*
+             delete sinon les resa confirmées ne peuvent pas être annulées car elles existent aussi dans resa tables
+             */
+            delete from reservation_tables where reservation_tables.reservation = _resa_id;
+            update reservations set status = 'cancelled'::status_type where reservations.id = _resa_id;
+        end if;
+    end;
+    $$language plpgsql security definer ;
+
+grant execute on function cancel_reservation(int) to authenticated;
+
+
+-- select auth.login_for_test('brlacroix@epfc.eu');
+-- select cancel_reservation(13);
+-- select status from reservations where id = 13;
+-- select auth.logout_for_test();
+
+select auth.login_for_test('brlacroix@epfc.eu');
+select cancel_reservation(13);
+select status from reservations where id = 13;
+select auth.logout_for_test();
