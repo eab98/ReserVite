@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:prbd_2526_a03/providers/manager_state_provider.dart';
 import 'package:prbd_2526_a03/views/widgets/reservation_tables_card.dart';
+import 'package:prbd_2526_a03/views/widgets/time_travel_widget.dart';
 
 class ReservationDetailsManagerScreen extends ConsumerWidget {
   const ReservationDetailsManagerScreen({super.key});
@@ -12,7 +13,6 @@ class ReservationDetailsManagerScreen extends ConsumerWidget {
     final state = ref.watch(managerStateProvider);
     final notifier = ref.read(managerStateProvider.notifier);
     final theme = Theme.of(context);
-    final simulatedTime = DateTime(2024, 12, 4, 16, 0);
 
 
     return state.when(
@@ -67,19 +67,7 @@ class ReservationDetailsManagerScreen extends ConsumerWidget {
                 child: SafeArea(
                   child: Padding(
                     padding: const EdgeInsets.only(top: 2.0),
-                    child: Tooltip(
-                      message:
-                      'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
-                      child: Text(
-                        DateFormat('EEEE dd/MM/yyyy HH:mm', 'fr_FR')
-                            .format(simulatedTime),
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: Colors.grey[400],
-                          fontWeight: FontWeight.normal,
-                        ),
-                      ),
-                    ),
+                    child: TimeTravelWidget(),
                   ),
                 ),
               ),
@@ -198,17 +186,7 @@ class ReservationDetailsManagerScreen extends ConsumerWidget {
                                 const Icon(Icons.info, size: 20),
                                 const SizedBox(width: 8),
                                 const Text('Statut: '),
-                                Chip(
-                                  label: Text(
-                                    reservation.status,
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  backgroundColor: const Color(0xFF4CAF50),
-                                  padding: EdgeInsets.zero,
-                                ),
+                                _statusIcon(reservation.status)
                               ],
                             ),
                             const SizedBox(height: 16),
@@ -232,24 +210,68 @@ class ReservationDetailsManagerScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 16),
                     ReservationTablesCard(tables: tables),
-                    const SizedBox(height: 24),
-                    ElevatedButton.icon(
-                      onPressed: () {},
-                      icon: const Icon(Icons.check_circle),
-                      label: const Text('Marquer comme terminée'),
-                    ),
-                    const SizedBox(height: 8),
-                    OutlinedButton.icon(
-                      onPressed: () {},
-                      icon: const Icon(Icons.cancel),
-                      label: const Text('Annuler'),
-                    ),
-                  ],
+                    if (reservation.status != 'completed' && reservation.status != 'cancelled') ...[
+                        const SizedBox(height: 24),
+                        ElevatedButton.icon(
+                          onPressed: () {},
+                          icon: const Icon(Icons.check_circle),
+                          label: const Text('Marquer comme terminée'),
+                        ),
+                        const SizedBox(height: 8),
+                        OutlinedButton.icon(
+                          onPressed: () {},
+                          icon: const Icon(Icons.cancel),
+                          label: const Text('Annuler'),
+                        ),
+                    ]],
                 ),
               ),
             ),
           );
         }
     );
+  }
+
+  Widget _statusIcon(String status){
+    switch (status) {
+      case 'pending':
+        return Chip(
+          label: const Text(
+            'En attente',
+            style: TextStyle(fontSize: 12, color: Colors.white),
+          ),
+          backgroundColor: const Color(0xFFFF9800),
+          padding: EdgeInsets.zero,
+        );
+      case 'confirmed':
+        return Chip(
+          label: const Text(
+            'Confirmée',
+            style: TextStyle(fontSize: 12, color: Colors.white),
+          ),
+          backgroundColor:  Colors.green,
+          padding: EdgeInsets.zero,
+        );
+      case 'cancelled':
+        return Chip(
+          label: const Text(
+            'Annulée',
+            style: TextStyle(fontSize: 12, color: Colors.white),
+          ),
+          backgroundColor:  Colors.red,
+          padding: EdgeInsets.zero,
+        );
+      case 'completed':
+        return Chip(
+          label: const Text(
+            'Terminée',
+            style: TextStyle(fontSize: 12, color: Colors.white),
+          ),
+          backgroundColor:  Colors.blue,
+          padding: EdgeInsets.zero,
+        );
+      default:
+        return const Icon(Icons.help);
+    }
   }
 }
