@@ -25,7 +25,8 @@ class TimeServices {
   static Future<void> saveSimulatedTime(DateTime time) async {
     final response = await ApiClient.post(
       'save_simulated_time',
-          body : json.encode({'_timestamp':time.toIso8601String()})
+          body : json.encode({'_timestamp':time.toIso8601String()}),
+        anonymous: true
     );
 
     if(response.statusCode != 200 && response.statusCode != 204) {
