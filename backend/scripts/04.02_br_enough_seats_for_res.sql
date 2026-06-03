@@ -39,7 +39,7 @@ $$
         end if;
         return null;
     end;
-$$ language plpgsql;
+$$ language plpgsql security definer ;
 
 
 create or replace trigger check_capacity_resa
