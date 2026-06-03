@@ -79,7 +79,7 @@ create or replace function get_service_for_datetime(_restaurant int, _date times
 
 
 --on regarde si le client n'a pas déjà réservé pour ce même service au même jour et au même resto
-create or replace function check_existing_reservation_for_service(_restaurant int, _date timestamp)
+create or replace function check_existing_reservation_for_service(_restaurant int, _date timestamp, _exclude_id_for_edit int default null)
     returns boolean as
     $$
     declare
@@ -99,6 +99,7 @@ create or replace function check_existing_reservation_for_service(_restaurant in
             FROM reservations resa
             WHERE resa.client = client_id and resa.restaurant = _restaurant and resa.datetime::date = _date::date
             and resa.datetime::time >= serv.start_time and resa.datetime::time < serv.end_time and resa.status in ('pending', 'confirmed')
+            and (_exclude_id_for_edit is null or resa.id <> _exclude_id_for_edit)
         );
 
 
@@ -107,7 +108,7 @@ create or replace function check_existing_reservation_for_service(_restaurant in
 
 --on regarde s'il existe une table disponible pour un nombre de guest donné pour un créneau donné
 
-create or replace function check_capacity(_restaurant int, _number_of_guests int, _date timestamp)
+create or replace function check_capacity(_restaurant int, _number_of_guests int, _date timestamp, _exclude_id_for_edit int default null)
     returns boolean as
     $$
     begin
@@ -119,15 +120,16 @@ create or replace function check_capacity(_restaurant int, _number_of_guests int
                                from reservation_tables rt, reservations resa
                                where rt."table" = t.id and rt.reservation = resa.id
                                and resa.datetime = _date
-                               and resa.status in ('pending', 'confirmed'))
+                               and resa.status in ('pending', 'confirmed')
+                            and (_exclude_id_for_edit is null or _exclude_id_for_edit <> resa.id))
 
         );
     end;
     $$language plpgsql security definer;
-grant execute on function check_capacity(int, int, timestamp) to authenticated;
+grant execute on function check_capacity(int, int, timestamp, int) to authenticated;
 
 --on regarde si un certain slot est disponible pour cette date la pour ce nombre de guests
-create or replace function check_slot_available(_restaurant int, _date timestamp, _number_of_guests int)
+create or replace function check_slot_available(_restaurant int, _date timestamp, _number_of_guests int, _exclude_id_for_edit int default null)
     returns boolean as
     $$
     declare
@@ -139,7 +141,7 @@ create or replace function check_slot_available(_restaurant int, _date timestamp
             return false;
         end if;
 
-        if (check_existing_reservation_for_service(_restaurant, _date)) then
+        if (check_existing_reservation_for_service(_restaurant, _date, _exclude_id_for_edit)) then
             return false;
         end if;
 
@@ -153,7 +155,7 @@ create or replace function check_slot_available(_restaurant int, _date timestamp
 
 --on cherche les slots disponibles pour une date donnée, si aucun slot il faut un message d'erreur spécifique
 
-create or replace function get_available_slots_for_date(_restaurant int, _date timestamp, _number_of_guests int)
+create or replace function get_available_slots_for_date(_restaurant int, _date timestamp, _number_of_guests int, _exclude_id_for_edit int default null)
 returns table(slot_datetime timestamp) as
     $$
     declare
@@ -178,11 +180,11 @@ returns table(slot_datetime timestamp) as
             from services s
             where s.restaurant=_restaurant and s.day_of_week = extract(isodow from _date)::int
             ) slot_candidates
-            where check_slot_available(_restaurant, slot_candidate, _number_of_guests);
+            where check_slot_available(_restaurant, slot_candidate, _number_of_guests, _exclude_id_for_edit);
 
     end;
     $$language plpgsql security definer ;
-grant execute on function get_available_slots_for_date(int, timestamp, int) to authenticated;
+grant execute on function get_available_slots_for_date(int, timestamp, int, int) to authenticated;
 
 --on regrde la raison spécifique pour laquelle in l'y a pas de spot disponible
 create or replace function get_specific_error_if_no_slots(_restaurant int, _date timestamp)
