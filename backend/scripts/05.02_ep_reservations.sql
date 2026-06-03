@@ -324,3 +324,25 @@ select auth.login_for_test('brlacroix@epfc.eu');
 select cancel_reservation(13);
 select status from reservations where id = 13;
 select auth.logout_for_test();
+
+create or replace function get_all_reservations_for_restaurant(restaurant_id int)
+returns table(
+                 id int,
+                 name varchar,
+                 client_name varchar,
+                 status status_type,
+                 datetime timestamp,
+                 number_of_guests int
+             ) as
+$$
+    begin
+        perform auth.check_logged();
+        return query
+        select res.id, resto.name, u.full_name, res.status, res.datetime, res.number_of_guests from reservations res
+            join restaurants resto on resto.id = res.restaurant
+            join users u on res.client = u.id where resto.id = restaurant_id
+        order by res.datetime DESC;
+    end;
+$$ language plpgsql security definer;
+
+grant execute on function get_all_reservations_for_restaurant(restaurant_id int) to manager;

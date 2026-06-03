@@ -7,16 +7,17 @@ import '../../providers/client_state_provider.dart';
 
 class ManagerRestaurantCard extends ConsumerWidget {
   final Restaurant restaurant;
+  final VoidCallback? onTap;
 
 
   const ManagerRestaurantCard({
     super.key,
     required this.restaurant,
+    this.onTap
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(managerStateProvider);
     final notifier = ref.read(managerStateProvider.notifier);
     String currencyLogo = '';
     if (restaurant.priceRange != null) {
@@ -83,7 +84,11 @@ class ManagerRestaurantCard extends ConsumerWidget {
           ],
         ),
         trailing: const Icon(Icons.chevron_right),
-        onTap: () {
+        onTap: () async {
+          await notifier.selectRestaurant(restaurant);
+          if (context.mounted) {
+            Navigator.pushNamed(context, '/restaurant_management_reservations');
+          }
         },
       ),
     );

@@ -1,6 +1,6 @@
 class Reservation {
   final int id;
-  final String name;
+  final String restoName;
   final String status;
   final String? city;
   final DateTime dateTime;
@@ -8,17 +8,19 @@ class Reservation {
   final String? restoPhone;
   final String? restoAddress;
   final String? specialRequests;
+  final String? clientName;
 
   const Reservation({
     required this.id,
-    required this.name,
+    required this.restoName,
     required this.status,
     this.city,
     required this.dateTime,
     required this.numberOfGuests,
     this.restoAddress,
     this.restoPhone,
-    this.specialRequests
+    this.specialRequests,
+    this.clientName
 
 
   });
@@ -26,14 +28,15 @@ class Reservation {
   factory Reservation.fromJson(Map<String, dynamic> json){
     return Reservation(
         id: json['id'],
-        name: json['name'],
+        restoName: json['name'],
         status: json['status'],
         city: json['city'],
         dateTime: DateTime.parse(json['datetime']),
         numberOfGuests: json['number_of_guests'],
         restoAddress : json['address'],
         restoPhone : json['phone'],
-      specialRequests: json['special_request']
+      specialRequests: json['special_request'],
+      clientName: json['client_name']
     );
   }
 

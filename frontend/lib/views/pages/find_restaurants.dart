@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:prbd_2526_a03/core/tools/constants.dart';
 import 'package:prbd_2526_a03/providers/client_state_provider.dart';
 import '../widgets/restaurant_card.dart';
+import '../widgets/too_many_results_banner.dart';
 
 
 class FindRestaurantsScreen extends ConsumerWidget {
@@ -79,34 +80,8 @@ class FindRestaurantsScreen extends ConsumerWidget {
             Expanded(
               child: Column(
                 children: [
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 8.0,
-                      horizontal: 16.0,
-                    ),
-                    color: Colors.orange.shade50,
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.info_outline,
-                          size: 20,
-                          color: Colors.orange.shade800,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'Trop de résultats trouvés. Veuillez affiner votre recherche pour voir plus de restaurants.',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.orange.shade900,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  if (state.value!.restaurants.length > Constants.maxRestaurants)
+                    const TooManyResultsBanner(),
                   Expanded(
                     child: ListView.builder(
                       padding: const EdgeInsets.all(16),

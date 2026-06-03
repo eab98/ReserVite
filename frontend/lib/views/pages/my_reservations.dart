@@ -161,7 +161,7 @@ class _MyReservationsScreen extends ConsumerState<MyReservationsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                      Text(
-                      r.name,
+                      r.restoName,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,

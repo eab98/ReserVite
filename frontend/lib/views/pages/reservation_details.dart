@@ -92,7 +92,7 @@ class _ReservationDetailsScreen extends ConsumerState<ReservationDetailsScreen> 
                                   const SizedBox(width: 8),
                                    Expanded(
                                     child: Text(
-                                      r.name,
+                                      r.restoName,
                                       style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
