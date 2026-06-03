@@ -221,7 +221,7 @@ class ReservationDetailsManagerScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: 8),
                         OutlinedButton.icon(
-                          onPressed: () {},
+                          onPressed: () => _confirmCancel(context, ref, reservation.id),
                           icon: const Icon(Icons.cancel),
                           label: const Text('Annuler'),
                         ),
@@ -261,7 +261,9 @@ class ReservationDetailsManagerScreen extends ConsumerWidget {
     final notifier = ref.read(managerStateProvider.notifier);
     await notifier.refreshReservationsForCurrentRestaurant();
     await notifier.refreshRestaurants();
-    await notifier.refreshReservationDetails();
+
+    final list = ref.read(managerStateProvider).value!.reservations;
+    await notifier.selectReservation(list.firstWhere((r) => r.id == resaId));
 
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
