@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:prbd_2526_a03/providers/manager_state_provider.dart';
 
+import '../../core/services/reservation_services.dart';
+import '../../core/services/restaurant_services.dart';
 import '../../models/restaurant.dart';
 import '../../providers/client_state_provider.dart';
+import '../../providers/reference_time_provider.dart';
 
 class ManagerRestaurantCard extends ConsumerWidget {
   final Restaurant restaurant;
@@ -56,30 +60,39 @@ class ManagerRestaurantCard extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: 4),
+            if (restaurant.latestReservation != null) ...[
             Row(
               children: [
                 const Icon(Icons.access_time, size: 14, color: Colors.grey),
                 const SizedBox(width: 4),
                 Text(
-                  'Dernière réservation: mer. 04/12/2024',
+                    'Dernière réservation: ${_formatRelative(restaurant.latestReservation!)}',
                   style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                 ),
               ],
             ),
+            ],
             const SizedBox(height: 4),
-            const Row(
-              children: [
-                Icon(Icons.pending, size: 14, color: Colors.orange),
-                SizedBox(width: 4),
-                Text(
-                  '2 demandes en attente',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.orange,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
+            FutureBuilder<int>(
+              future: RestaurantServices.getPendingCount(restaurant.id),
+              builder: (context, snapshot) {
+                final count = snapshot.data ?? 0;
+                if (count == 0) return const SizedBox.shrink();
+                return Row(
+                  children: [
+                    const Icon(Icons.pending, size: 14, color: Colors.orange),
+                    const SizedBox(width: 4),
+                    Text(
+                      '$count demande${count > 1 ? 's' : ''} en attente',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.orange,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
           ],
         ),
@@ -92,5 +105,8 @@ class ManagerRestaurantCard extends ConsumerWidget {
         },
       ),
     );
+  }
+  String _formatRelative(DateTime last) {
+    return DateFormat('EEE dd/MM/yyyy', 'fr_FR').format(last);
   }
 }
