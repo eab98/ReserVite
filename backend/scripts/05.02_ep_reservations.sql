@@ -272,6 +272,7 @@ create or replace function save_reservation(
             returning id into _new_id;
             return _new_id;
         else
+            delete from reservation_tables where reservation = _id;
             update reservations set client = _client,
                                     restaurant=_restaurant,
                                     datetime = _date,
