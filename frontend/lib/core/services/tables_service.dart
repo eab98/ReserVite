@@ -19,4 +19,23 @@ class TablesService {
     final List<dynamic> rows = body;
     return rows.map((rows) => Tables.fromJson(rows)).toList();
   }
+
+  static Future<List<Tables>> getAllAvailableTables(int reservationId) async {
+    final response = await ApiClient.post(
+      'get_all_available_tables',
+      body: json.encode({
+        'reservation_id': reservationId,
+      }),
+      anonymous: false,
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to fetch available tables, please try again later');
+    }
+
+    final dynamic body = json.decode(response.body);
+    final List<dynamic> rows = body;
+
+    return rows.map((row) => Tables.fromJson(row)).toList();
+  }
 }
