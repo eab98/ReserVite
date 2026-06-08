@@ -160,7 +160,12 @@ class _RestaurantManagementReservationsScreenState
           bottomNavigationBar: BottomNavigationBar(
             type: BottomNavigationBarType.fixed,
             currentIndex: 0,
-            onTap: (_) {},
+            onTap: (index) {
+              const addr = ['/restaurant_management_reservations', '/manage_services', '/manage_tables'];
+              if (index !=  0) {
+                Navigator.pushNamed(context, addr[index]);
+              }
+            },
             items: const [
               BottomNavigationBarItem(
                 icon: Icon(Icons.book),
