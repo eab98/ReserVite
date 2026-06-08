@@ -4,6 +4,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:prbd_2526_a03/core/tools/params.dart';
 import 'package:prbd_2526_a03/views/pages/add_reservation.dart';
 import 'package:prbd_2526_a03/views/pages/assign_tables.dart';
+import 'package:prbd_2526_a03/views/pages/edit_service.dart';
 import 'package:prbd_2526_a03/views/pages/find_restaurants.dart';
 import 'package:prbd_2526_a03/views/pages/login.dart';
 import 'package:prbd_2526_a03/views/pages/my_reservations.dart';
@@ -11,6 +12,7 @@ import 'package:prbd_2526_a03/views/pages/my_restaurants.dart';
 import 'package:prbd_2526_a03/views/pages/reservation_details_manager.dart';
 import 'package:prbd_2526_a03/views/pages/restaurant_details.dart';
 import 'package:prbd_2526_a03/views/pages/restaurant_management_reservations.dart';
+import 'package:prbd_2526_a03/views/pages/restaurant_management_services.dart';
 import 'package:prbd_2526_a03/views/pages/signup.dart';
 
 
@@ -35,7 +37,9 @@ void main() async {
         '/add_reservation' : (context) => const NewReservationScreen(),
         '/restaurant_management_reservations' : (context) => const RestaurantManagementReservationsScreen(),
         '/reservation_details_manager' : (context) => const ReservationDetailsManagerScreen(),
-        '/assign_tables' : (context) => const AssignTablesScreen()
+        '/assign_tables' : (context) => const AssignTablesScreen(),
+        '/manage_services' : (context) => const RestaurantManagementServicesScreen(),
+        '/edit_service': (context) => const EditServiceScreen(),
       }
     ),
   )

@@ -24,7 +24,6 @@ class _RestaurantManagementReservationsScreenState
     final state = ref.watch(managerStateProvider);
     final notifier = ref.read(managerStateProvider.notifier);
     final theme = Theme.of(context);
-    final simulatedTime = DateTime(2024, 12, 4, 16, 0);
 
     return state.when(
       loading: () => const Scaffold(
@@ -57,7 +56,10 @@ class _RestaurantManagementReservationsScreenState
           appBar: AppBar(
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.popUntil(
+                context,
+                ModalRoute.withName('/home_manager'),
+              ),
             ),
             title: Text(restaurant.name),
             automaticallyImplyLeading: false,
@@ -160,7 +162,12 @@ class _RestaurantManagementReservationsScreenState
           bottomNavigationBar: BottomNavigationBar(
             type: BottomNavigationBarType.fixed,
             currentIndex: 0,
-            onTap: (_) {},
+            onTap: (index) {
+              const addr = ['/restaurant_management_reservations', '/manage_services', '/manage_tables'];
+              if (index !=  0) {
+                Navigator.pushNamed(context, addr[index]);
+              }
+            },
             items: const [
               BottomNavigationBarItem(
                 icon: Icon(Icons.book),

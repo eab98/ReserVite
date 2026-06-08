@@ -1,9 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:http/http.dart';
-import 'package:prbd_2526_a03/core/services/restaurant_services.dart';
 import 'package:prbd_2526_a03/core/services/reservation_services.dart';
+import 'package:prbd_2526_a03/core/services/restaurant_services.dart';
 import 'package:prbd_2526_a03/models/no_slots_reason.dart';
 import 'package:prbd_2526_a03/models/reservation.dart';
 import 'package:prbd_2526_a03/models/restaurant.dart';
