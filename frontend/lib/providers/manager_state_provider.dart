@@ -20,6 +20,8 @@ class ManagerState {
   final Customer? currentCustomer;
   final List<Tables> currentTables;
   final List<Tables> availableTables;
+  final List<Tables> tablesPerRestaurant;
+  final Tables? currentTable;
 
   const ManagerState({
     this.restaurants = const [],
@@ -28,7 +30,9 @@ class ManagerState {
     this.currentReservation,
     this.currentCustomer,
     this.currentTables = const [],
-    this.availableTables = const []
+    this.availableTables = const [],
+    this.tablesPerRestaurant = const [],
+    this.currentTable
   });
 
   ManagerState copyWith({
@@ -38,7 +42,9 @@ class ManagerState {
     Reservation? currentReservation,
     Customer? currentCustomer,
     List<Tables>? currentTables,
-    List<Tables>? availableTables
+    List<Tables>? availableTables,
+    List<Tables>? tablesPerRestaurant,
+    Tables? currentTable
   }) {
     return ManagerState(
       restaurants: restaurants ?? this.restaurants,
@@ -47,7 +53,9 @@ class ManagerState {
       currentReservation: currentReservation ?? this.currentReservation,
       currentCustomer: currentCustomer ?? this.currentCustomer,
       currentTables: currentTables ?? this.currentTables,
-      availableTables: availableTables ?? this.availableTables
+      availableTables: availableTables ?? this.availableTables,
+      tablesPerRestaurant: tablesPerRestaurant ?? this.tablesPerRestaurant,
+      currentTable: currentTable ?? this.currentTable
     );
   }
 }
@@ -266,5 +274,43 @@ class ManagerStateNotifier extends AsyncNotifier<ManagerState> {
     } catch (e, st) {
       state = AsyncError(e, st);
     }
+  }
+
+  Future<void> loadTables() async {
+    final previous = state.value;
+    if(previous==null) return;
+
+    final restaurant = previous.currentRestaurant;
+    if(restaurant == null) return;
+
+    try {
+      final tables = await TablesService.getTablesPerRestaurant(restaurant.id);
+      state = AsyncData(previous.copyWith(
+        tablesPerRestaurant: tables
+      ));
+
+    } catch (e) {
+      state = AsyncError(e, StackTrace.current);
+    }
+
+  }
+
+  Future<void> saveTable(int tableNumber, int tableCapacity, int? tableId) async {
+    final previous = state.value;
+    if(previous==null) return;
+
+    final restaurant = previous.currentRestaurant;
+    if(restaurant == null) return;
+
+    try {
+       await TablesService.saveTable(restaurant.id, tableNumber, tableCapacity, tableId);
+       final tables = await TablesService.getTablesPerRestaurant(restaurant.id);
+      state = AsyncData(previous.copyWith(
+        tablesPerRestaurant: tables
+      ));
+    } catch (e) {
+      state = AsyncError(e, StackTrace.current);
+    }
+
   }
 }
