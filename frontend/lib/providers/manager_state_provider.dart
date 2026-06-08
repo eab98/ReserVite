@@ -10,6 +10,7 @@ import 'package:prbd_2526_a03/providers/simulated_time_provider.dart';
 
 import '../core/services/restaurant_services.dart';
 import '../models/restaurant.dart';
+import '../models/services.dart';
 import 'current_user_provider.dart';
 
 class ManagerState {
@@ -20,6 +21,7 @@ class ManagerState {
   final Customer? currentCustomer;
   final List<Tables> currentTables;
   final List<Tables> availableTables;
+  final List<Services> currentRestaurantServices;
 
   const ManagerState({
     this.restaurants = const [],
@@ -28,7 +30,8 @@ class ManagerState {
     this.currentReservation,
     this.currentCustomer,
     this.currentTables = const [],
-    this.availableTables = const []
+    this.availableTables = const [],
+    this.currentRestaurantServices = const []
   });
 
   ManagerState copyWith({
@@ -38,7 +41,8 @@ class ManagerState {
     Reservation? currentReservation,
     Customer? currentCustomer,
     List<Tables>? currentTables,
-    List<Tables>? availableTables
+    List<Tables>? availableTables,
+    List<Services>? currentRestaurantServices
   }) {
     return ManagerState(
       restaurants: restaurants ?? this.restaurants,
@@ -47,7 +51,8 @@ class ManagerState {
       currentReservation: currentReservation ?? this.currentReservation,
       currentCustomer: currentCustomer ?? this.currentCustomer,
       currentTables: currentTables ?? this.currentTables,
-      availableTables: availableTables ?? this.availableTables
+      availableTables: availableTables ?? this.availableTables,
+      currentRestaurantServices: currentRestaurantServices ?? this.currentRestaurantServices
     );
   }
 }
@@ -205,6 +210,29 @@ class ManagerStateNotifier extends AsyncNotifier<ManagerState> {
       state = AsyncData(
         previous.copyWith(
           reservations: reservations,
+        ),
+      );
+    } catch (e, st) {
+      state = AsyncError(e, st);
+    }
+  }
+
+  Future<void> refreshServices() async {
+    final previous = state.value;
+
+    if (previous == null) return;
+
+    final restaurant = previous.currentRestaurant;
+
+    try {
+      final data =
+      await RestaurantServices.getServices(restaurant!.id);
+
+      final current = state.value ?? previous;
+
+      state = AsyncData(
+        current.copyWith(
+          currentRestaurantServices: data,
         ),
       );
     } catch (e, st) {
