@@ -110,7 +110,7 @@ table(id int, restaurant int, table_number int, capacity int, min_needed_capacit
         return query
         select t.id, t.restaurant, t.table_number, t.capacity, coalesce((select max(resa.number_of_guests)
                                                                 from reservation_tables rt, reservations resa
-                                                                where rt."table" = t.id), 0)
+                                                                where rt."table" = t.id and resa.id = rt.reservation), 0)
         from tables t
         where t.restaurant = resto_id
         order by t.capacity , t.table_number;

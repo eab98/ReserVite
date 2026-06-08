@@ -40,9 +40,8 @@ class _EditTableScreen extends ConsumerState<EditTableScreen>{
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final limit = (isEdit && widget.table?.minCapacityNeeded != null)
-        ? widget.table!.minCapacityNeeded!
-        : 1;
+    final minNeeded = widget.table?.minCapacityNeeded ?? 0;
+    final limit = minNeeded > 1 ? minNeeded : 1;
     final atLimit = capacity <= limit;
 
 
@@ -57,7 +56,7 @@ class _EditTableScreen extends ConsumerState<EditTableScreen>{
         actions: [
           IconButton(
             tooltip: 'Enregistrer',
-            onPressed: () => _saveTable(),
+            onPressed: () =>  _saveTable(),
             icon: const Icon(Icons.save),
           ),
         ],

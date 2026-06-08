@@ -90,7 +90,12 @@ class RestaurantManagementTablesScreen extends ConsumerStatefulWidget {
                   right: 16,
                   child: FloatingActionButton(
                     heroTag: 'tables_fab',
-                    onPressed: () {},
+                    onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => EditTableScreen(table : null),
+                        ),
+                        ),
                     child: const Icon(Icons.add),
                   ),
                 ),
