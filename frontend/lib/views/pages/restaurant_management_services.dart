@@ -4,6 +4,9 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:prbd_2526_a03/providers/manager_state_provider.dart';
 
+import '../../models/reservation.dart';
+import '../../models/services.dart';
+import '../widgets/service_card.dart';
 import '../widgets/time_travel_widget.dart';
 
 void main() async {
@@ -28,7 +31,7 @@ class RestaurantManagementServicesScreen extends ConsumerWidget {
     final state = ref.watch(managerStateProvider);
     final notifier = ref.read(managerStateProvider.notifier);
     final theme = Theme.of(context);
-    final simulatedTime = DateTime(2024, 12, 4, 16, 0);
+
     return state.when(
         loading: () => const Scaffold(
           body: Center(
@@ -42,7 +45,36 @@ class RestaurantManagementServicesScreen extends ConsumerWidget {
         ),
         data: (managerState) {
           notifier.refreshServices();
+          final restaurant = managerState.currentRestaurant;
           final services = managerState.currentRestaurantServices;
+          final reservations = managerState.reservations;
+          final List<int> deletable = [];
+
+          final slotDuration =
+              managerState.currentRestaurant?.slotDuration ?? 1;
+
+          final deletableServiceIds = services
+              .where(
+                (service) => _isServiceDeletable(
+              service,
+              reservations,
+              slotDuration,
+            ),
+          )
+              .map((service) => service.id)
+              .toSet();
+
+          final servicesByDay =
+          <int, List<Services>>{};
+
+          for (final service in services) {
+            servicesByDay
+                .putIfAbsent(
+              service.dayOfWeek,
+                  () => [],
+            )
+                .add(service);
+          }
 
         return Scaffold(
           appBar: AppBar(
@@ -53,7 +85,7 @@ class RestaurantManagementServicesScreen extends ConsumerWidget {
                 ModalRoute.withName('/home_manager'),
               ),
             ),
-            title: const Text('Le Gourmet'),
+            title: Text(restaurant!.name),
             automaticallyImplyLeading: false,
             actions: [
               IconButton(
@@ -82,175 +114,54 @@ class RestaurantManagementServicesScreen extends ConsumerWidget {
                 ListView(
                   padding: const EdgeInsets.all(16.0),
                   children: [
-                    Card(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      color: Colors.grey[100],
-                      child: ListTile(
-                        leading: const Icon(Icons.schedule, color: Colors.grey),
-                        title: Text(
-                          'Lundi',
-                          style: TextStyle(color: Colors.grey[600]),
-                        ),
-                        subtitle: const Text(
-                          'Aucun service',
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      ),
+                    ServiceCard(
+                      dayName: 'Lundi',
+                      services: servicesByDay[1] ?? const [],
+                      onEdit: (service) {},
+                      onDelete: (service) {},
+                      canDelete: (service) => deletableServiceIds.contains(service.id)
                     ),
-                    Card(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      child: ListTile(
-                        leading: const Icon(Icons.schedule),
-                        title: const Text('Mardi'),
-                        subtitle: const Text('12:00 - 14:00, 19:00 - 22:00'),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.edit),
-                              onPressed: () {},
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () {},
-                              tooltip: 'Supprimer le service',
-                            ),
-                          ],
-                        ),
-                      ),
+                    ServiceCard(
+                      dayName: 'Mardi',
+                      services: servicesByDay[2] ?? const [],
+                      onEdit: (service) {},
+                      onDelete: (service) {},
+                      canDelete: (service) => deletableServiceIds.contains(service.id)
                     ),
-                    Card(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      child: ExpansionTile(
-                        leading: const Icon(Icons.schedule),
-                        title: const Text('Mercredi'),
-                        subtitle: const Text('12:00 - 14:00, 19:00 - 22:00'),
-                        children: [
-                          ListTile(
-                            title: const Text('12:00 - 14:00'),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: const Icon(Icons.edit),
-                                  onPressed: () {},
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.delete, color: Colors.red),
-                                  onPressed: () {},
-                                  tooltip: 'Supprimer le service',
-                                ),
-                              ],
-                            ),
-                          ),
-                          ListTile(
-                            title: const Text('19:00 - 22:00'),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: const Icon(Icons.edit),
-                                  onPressed: () {},
-                                ),
-                                IconButton(
-                                  icon: Icon(Icons.delete, color: Colors.grey[400]),
-                                  onPressed: null,
-                                  tooltip:
-                                      'Impossible de supprimer : des réservations non annulées utilisent ce service',
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                    ServiceCard(
+                      dayName: 'Mercredi',
+                      services: servicesByDay[3] ?? const [],
+                      onEdit: (service) {},
+                      onDelete: (service) {},
+                      canDelete: (service) => deletableServiceIds.contains(service.id)
                     ),
-                    Card(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      child: ListTile(
-                        leading: const Icon(Icons.schedule),
-                        title: const Text('Jeudi'),
-                        subtitle: const Text('12:00 - 14:00, 19:00 - 22:00'),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.edit),
-                              onPressed: () {},
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () {},
-                              tooltip: 'Supprimer le service',
-                            ),
-                          ],
-                        ),
-                      ),
+                    ServiceCard(
+                      dayName: 'Jeudi',
+                      services: servicesByDay[4] ?? const [],
+                      onEdit: (service) {},
+                      onDelete: (service) {},
+                      canDelete: (service) => deletableServiceIds.contains(service.id)
                     ),
-                    Card(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      child: ListTile(
-                        leading: const Icon(Icons.schedule),
-                        title: const Text('Vendredi'),
-                        subtitle: const Text('12:00 - 14:00, 19:00 - 23:00'),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.edit),
-                              onPressed: () {},
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () {},
-                              tooltip: 'Supprimer le service',
-                            ),
-                          ],
-                        ),
-                      ),
+                    ServiceCard(
+                      dayName: 'Vendredi',
+                      services: servicesByDay[5] ?? const [],
+                      onEdit: (service) {},
+                      onDelete: (service) {},
+                        canDelete: (service) => deletableServiceIds.contains(service.id)
                     ),
-                    Card(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      child: ListTile(
-                        leading: const Icon(Icons.schedule),
-                        title: const Text('Samedi'),
-                        subtitle: const Text('19:00 - 23:00'),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.edit),
-                              onPressed: () {},
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () {},
-                              tooltip: 'Supprimer le service',
-                            ),
-                          ],
-                        ),
-                      ),
+                    ServiceCard(
+                      dayName: 'Samedi',
+                      services: servicesByDay[6] ?? const [],
+                      onEdit: (service) {},
+                      onDelete: (service) {},
+                      canDelete: (service) => deletableServiceIds.contains(service.id)
                     ),
-                    Card(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      child: ListTile(
-                        leading: const Icon(Icons.schedule),
-                        title: const Text('Dimanche'),
-                        subtitle: const Text('12:00 - 14:00'),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.edit),
-                              onPressed: () {},
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () {},
-                              tooltip: 'Supprimer le service',
-                            ),
-                          ],
-                        ),
-                      ),
+                    ServiceCard(
+                      dayName: 'Dimanche',
+                      services: servicesByDay[7] ?? const [],
+                      onEdit: (service) {},
+                      onDelete: (service) {},
+                      canDelete: (service) => deletableServiceIds.contains(service.id)
                     ),
                   ],
                 ),
@@ -292,6 +203,58 @@ class RestaurantManagementServicesScreen extends ConsumerWidget {
           ),
         );
       },
+    );
+  }
+
+  bool _isServiceDeletable(
+      Services service,
+      List<Reservation> reservations,
+      int slotDuration,
+      ) {
+    return !reservations.any(
+          (reservation) => _reservationBlocksServiceDeletion(
+        service,
+        reservation,
+        slotDuration,
+      ),
+    );
+  }
+
+  bool _reservationBlocksServiceDeletion(
+      Services service,
+      Reservation reservation,
+      int slotDuration,
+      ) {
+    if (reservation.status == 'completed' ||
+        reservation.status == 'cancelled') {
+      return false;
+    }
+
+    if (reservation.dateTime.weekday != service.dayOfWeek) {
+      return false;
+    }
+
+    final serviceStart = _parseTime(service.startTime);
+    final serviceEnd = _parseTime(service.endTime);
+
+    final reservationStart = Duration(
+      hours: reservation.dateTime.hour,
+      minutes: reservation.dateTime.minute,
+    );
+
+    final reservationEnd = reservationStart +
+        Duration(minutes: slotDuration);
+
+    return reservationStart < serviceEnd &&
+        reservationEnd > serviceStart;
+  }
+
+  Duration _parseTime(String value) {
+    final parts = value.split(':');
+
+    return Duration(
+      hours: int.parse(parts[0]),
+      minutes: int.parse(parts[1]),
     );
   }
 }

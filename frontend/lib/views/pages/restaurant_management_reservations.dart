@@ -24,7 +24,6 @@ class _RestaurantManagementReservationsScreenState
     final state = ref.watch(managerStateProvider);
     final notifier = ref.read(managerStateProvider.notifier);
     final theme = Theme.of(context);
-    final simulatedTime = DateTime(2024, 12, 4, 16, 0);
 
     return state.when(
       loading: () => const Scaffold(
