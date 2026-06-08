@@ -102,13 +102,13 @@ grant execute on function assign_tables_to_reservation(reservation_id int, guest
 -- having r.number_of_guests > coalesce(sum(t.capacity), 0);
 
 create or replace function get_tables_per_restaurant(resto_id int) returns
-table(table_id int, table_capacity int, table_number int) as
+table(id int, restaurant int, table_number int, capacity int) as
     $$
     begin
         if not is_manager_to_restaurant(resto_id) then raise exception 'You do not have access to this information';
         end if;
         return query
-        select t.id, t.capacity, t.table_number
+        select t.id, t.restaurant, t.table_number, t.capacity
         from tables t
         where t.restaurant = resto_id
         order by t.capacity , t.table_number;

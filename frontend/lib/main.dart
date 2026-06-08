@@ -39,7 +39,6 @@ void main() async {
         '/reservation_details_manager' : (context) => const ReservationDetailsManagerScreen(),
         '/assign_tables' : (context) => const AssignTablesScreen(),
         '/manage_tables' : (context) => const RestaurantManagementTablesScreen(),
-        '/edit_table' : (context) => const EditTableScreen(tableId: 0)
       }
     ),
   )
