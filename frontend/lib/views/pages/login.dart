@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:prbd_2526_a03/core/tools/validating_text_editing_controller.dart';
 import 'package:prbd_2526_a03/models/user.dart';
 import 'package:prbd_2526_a03/providers/current_user_provider.dart';
+import 'package:prbd_2526_a03/providers/simulated_time_provider.dart';
 
 import '../widgets/time_travel_widget.dart';
 
@@ -221,7 +222,10 @@ class LoginScreen extends ConsumerStatefulWidget {
                     SizedBox(
                       width: double.infinity,
                       child: OutlinedButton.icon(
-                        onPressed: () => _resetDataBase(),
+                        onPressed: () async {
+                          await _resetDataBase();
+                          await ref.read(simulatedTimeProvider.notifier).reload();
+                        },
                         icon: const Icon(Icons.refresh),
                         label: const Text('Réinitialiser la base de données'),
                         style: OutlinedButton.styleFrom(
