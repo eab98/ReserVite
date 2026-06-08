@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/date_symbol_data_local.dart';
-import 'package:intl/intl.dart';
+import 'package:prbd_2526_a03/providers/manager_state_provider.dart';
+import 'package:prbd_2526_a03/views/widgets/time_travel_widget.dart';
+
+import '../../models/tables.dart';
 
 
 
 class EditTableScreen extends ConsumerStatefulWidget {
-  final int tableId;
-  const EditTableScreen({super.key, required this.tableId});
+  final Tables? table;
+  const EditTableScreen({super.key, required this.table});
 
   @override
   ConsumerState<EditTableScreen> createState() => _EditTableScreen();
@@ -15,24 +17,47 @@ class EditTableScreen extends ConsumerStatefulWidget {
 
 
 class _EditTableScreen extends ConsumerState<EditTableScreen>{
+  bool get isEdit => widget.table != null;
+  final _tableNumberController = TextEditingController();
+  int capacity = 2;
+
+
+  @override
+  void initState(){
+    super.initState();
+    Future.microtask(() async {
+      if(isEdit){
+
+        setState(() {
+          _tableNumberController.text = (widget.table!.tableNumber).toString();
+          capacity = widget.table!.capacity;
+        });
+      }
+
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final simulatedTime = DateTime(2024, 12, 4, 16, 0);
+    final limit = (isEdit && widget.table?.minCapacityNeeded != null)
+        ? widget.table!.minCapacityNeeded!
+        : 1;
+    final atLimit = capacity <= limit;
+
 
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () {},
+          onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('Modifier la table'),
+        title:  Text(isEdit ? 'Modifier la table' : 'Nouvelle table'),
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
             tooltip: 'Enregistrer',
-            onPressed: () {},
+            onPressed: () => _saveTable(),
             icon: const Icon(Icons.save),
           ),
         ],
@@ -45,19 +70,7 @@ class _EditTableScreen extends ConsumerState<EditTableScreen>{
           child: SafeArea(
             child: Padding(
               padding: const EdgeInsets.only(top: 2.0),
-              child: Tooltip(
-                message:
-                'Date/heure simulée utilisée pour les tests.\nCliquez pour modifier.',
-                child: Text(
-                  DateFormat('EEEE dd/MM/yyyy HH:mm', 'fr_FR')
-                      .format(simulatedTime),
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: Colors.grey[400],
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
-              ),
+              child: TimeTravelWidget(),
             ),
           ),
         ),
@@ -70,8 +83,8 @@ class _EditTableScreen extends ConsumerState<EditTableScreen>{
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 TextFormField(
-                  initialValue: '2',
-                  decoration: const InputDecoration(
+                  controller: _tableNumberController,
+                  decoration:  const InputDecoration(
                     labelText: 'Numéro de table',
                     border: OutlineInputBorder(),
                   ),
@@ -81,17 +94,27 @@ class _EditTableScreen extends ConsumerState<EditTableScreen>{
                 const Text('Capacité'),
                 Row(
                   children: [
-                    IconButton(
-                      icon: const Icon(Icons.remove),
-                      onPressed: () {},
-                    ),
-                    const Text(
-                      '4 personnes',
+                      Tooltip(
+                      message: atLimit ? (isEdit ? 'Impossible de diminuer la capacité : une ou plusieurs résa utilisent cette table et nécessitent au moins cette capacité'
+                      : 'Capacité minimale (1 personne)')
+                      : '',
+                  child: IconButton(
+                    icon: const Icon(Icons.remove),
+                    onPressed: atLimit
+                        ? null
+                        : () => setState(() => capacity = capacity - 1),
+                  ),
+                ),
+
+                     Text(
+                      '$capacity personnes',
                       style: TextStyle(fontSize: 18),
                     ),
                     IconButton(
                       icon: const Icon(Icons.add),
-                      onPressed: () {},
+                      onPressed: () => setState(() {
+                        capacity = capacity + 1;
+                      }),
                     ),
                   ],
                 ),
@@ -101,5 +124,34 @@ class _EditTableScreen extends ConsumerState<EditTableScreen>{
         ),
       ),
     );
+  }
+
+  Future<void> _saveTable() async{
+    final table = widget.table;
+    final notifier = ref.read(managerStateProvider.notifier);
+    final number = int.tryParse(_tableNumberController.text);
+    if (number == null) {
+      return;
+    }
+
+    try {
+      if (table == null) {
+        await notifier.saveTable(number, capacity, null);
+      } else {
+        await notifier.saveTable(number, capacity, table.id);
+      }
+      if(!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Table sauvegardée avec succès'), backgroundColor: Colors.green));
+      // notifier.loadTables();
+      if (!mounted) return;
+      Navigator.pop(context);
+
+
+    }catch (e){
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erreur: $e'), backgroundColor: Colors.red));
+    }
   }
 }

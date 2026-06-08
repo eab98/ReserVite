@@ -46,13 +46,7 @@ class RestaurantManagementTablesScreen extends ConsumerStatefulWidget {
           final restaurant = state.currentRestaurant;
           final tables = state.tablesPerRestaurant;
 
-          if (tables.isEmpty) {
-            return const Scaffold(
-              body: Center(
-                child: Text('Aucune table à afficher. Veuillez ajouter une nouvelle table'),
-              ),
-            );
-          }
+
           return Scaffold(
           appBar: AppBar(
             leading: IconButton(
@@ -85,7 +79,9 @@ class RestaurantManagementTablesScreen extends ConsumerStatefulWidget {
           body: SafeArea(
             child: Stack(
               children: [
-                ListView(
+            tables.isEmpty
+            ? const Center(child: Text('Aucune table à afficher. Ajoutez-en une avec le bouton +'))
+                  : ListView(
                   padding: const EdgeInsets.all(16.0),
                   children: tables.map((table) => _buildCard(context, table)).toList(),
                 ),
@@ -132,7 +128,7 @@ class RestaurantManagementTablesScreen extends ConsumerStatefulWidget {
 
   Widget _buildCard(BuildContext context, Tables table){
     return Card(
-      margin: EdgeInsets.zero,
+      margin: const EdgeInsets.only(bottom: 16),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(
@@ -169,10 +165,11 @@ class RestaurantManagementTablesScreen extends ConsumerStatefulWidget {
             ),
             IconButton(
               icon: const Icon(Icons.edit),
-              onPressed: () => Navigator.push(
+              onPressed: () =>
+              Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => EditTableScreen(tableId: table.id),
+                  builder: (_) => EditTableScreen(table : table),
                 ),
               ),
             ),
