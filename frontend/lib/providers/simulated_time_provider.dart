@@ -20,5 +20,8 @@ class SimulatedTimeNotifier extends Notifier<DateTime?> {
     await TimeServices.saveSimulatedTime(time);
     state = time;
   }
+  Future<void> reload() async {
+    await _load();
+  }
 
 }
