@@ -100,3 +100,46 @@ grant execute on function assign_tables_to_reservation(reservation_id int, guest
 -- where r.status in ('confirmed','completed')
 -- group by r.id, r.number_of_guests
 -- having r.number_of_guests > coalesce(sum(t.capacity), 0);
+
+create or replace function get_tables_per_restaurant(resto_id int) returns
+table(table_id int, table_capacity int, table_number int) as
+    $$
+    begin
+        if not is_manager_to_restaurant(resto_id) then raise exception 'You do not have access to this information';
+        end if;
+        return query
+        select t.id, t.capacity, t.table_number
+        from tables t
+        where t.restaurant = resto_id
+        order by t.capacity , t.table_number;
+    end;
+    $$language plpgsql security definer ;
+
+grant execute on function get_tables_per_restaurant to manager;
+
+create or replace function save_table(
+    resto_id int,
+    _table_number int,
+    table_capacity int,
+    table_id int default null
+) returns int as
+    $$
+    declare
+        _new_id int;
+    begin
+        if not is_manager_to_restaurant(resto_id) then raise exception 'You do not have permission to this action';
+        end if;
+        if(table_id is null) then
+            INSERT INTO tables (restaurant, table_number, capacity)
+            values (resto_id, _table_number, table_capacity) returning id into _new_id;
+            return _new_id;
+        else
+            UPDATE tables
+            set restaurant = resto_id, table_number = _table_number, capacity = table_capacity
+            where id = table_id;
+            return table_id;
+        end if;
+    end;
+    $$language plpgsql security definer ;
+
+grant execute on function save_table to manager;
