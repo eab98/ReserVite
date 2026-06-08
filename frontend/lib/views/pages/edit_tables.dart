@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:prbd_2526_a03/core/tools/validating_text_editing_controller.dart';
 import 'package:prbd_2526_a03/providers/manager_state_provider.dart';
 import 'package:prbd_2526_a03/views/widgets/time_travel_widget.dart';
 
@@ -18,23 +19,43 @@ class EditTableScreen extends ConsumerStatefulWidget {
 
 class _EditTableScreen extends ConsumerState<EditTableScreen>{
   bool get isEdit => widget.table != null;
-  final _tableNumberController = TextEditingController();
+  late final ValidatingTextEditingController _tableNumberController;
   int capacity = 2;
 
 
   @override
   void initState(){
     super.initState();
-    Future.microtask(() async {
-      if(isEdit){
 
-        setState(() {
-          _tableNumberController.text = (widget.table!.tableNumber).toString();
-          capacity = widget.table!.capacity;
-        });
-      }
+    _tableNumberController = ValidatingTextEditingController(
+      validator: (input) {
+        if (input.trim().isEmpty) return 'Le numéro est requis';
+        final n = int.tryParse(input);
+        
+        final tables = ref.read(managerStateProvider).value?.tablesPerRestaurant ?? [];
+        //any pour verifier s'il y au moins un elem qui satisfait la condition
+        final taken = tables.any((table) => table.tableNumber == n && table.id != widget.table?.id );
+        if(taken) return 'Ce numéro est déjà utilisé pour ce restaurant';
 
-    });
+        return null;
+      },
+      initialValue: widget.table?.tableNumber.toString() ?? '2'
+    );
+
+    _tableNumberController.onAfterValidated = () => setState(() {});
+
+    if (isEdit) {
+      capacity = widget.table!.capacity;
+    }
+
+
+  }
+
+  @override
+  void dispose() {
+    _tableNumberController.dispose();
+    super.dispose();
+
   }
 
   @override
@@ -83,9 +104,10 @@ class _EditTableScreen extends ConsumerState<EditTableScreen>{
               children: [
                 TextFormField(
                   controller: _tableNumberController,
-                  decoration:  const InputDecoration(
+                  decoration:  InputDecoration(
                     labelText: 'Numéro de table',
-                    border: OutlineInputBorder(),
+                    border: const OutlineInputBorder(),
+                    errorText: _tableNumberController.errorText,
                   ),
                   keyboardType: TextInputType.number,
                 ),
@@ -126,24 +148,22 @@ class _EditTableScreen extends ConsumerState<EditTableScreen>{
   }
 
   Future<void> _saveTable() async{
-    final table = widget.table;
-    final notifier = ref.read(managerStateProvider.notifier);
+    await _tableNumberController.validateAndWait();
+    if (_tableNumberController.isValid != true) return;
+
     final number = int.tryParse(_tableNumberController.text);
+    final notifier = ref.read(managerStateProvider.notifier);
     if (number == null) {
       return;
     }
 
     try {
-      if (table == null) {
-        await notifier.saveTable(number, capacity, null);
-      } else {
-        await notifier.saveTable(number, capacity, table.id);
-      }
+        await notifier.saveTable(number, capacity, widget.table?.id);
+
       if(!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Table sauvegardée avec succès'), backgroundColor: Colors.green));
       // notifier.loadTables();
-      if (!mounted) return;
       Navigator.pop(context);
 
 
