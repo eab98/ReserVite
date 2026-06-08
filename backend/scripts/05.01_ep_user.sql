@@ -43,3 +43,32 @@ select save_user('Test', 'test@example.com', 'Password1,');
 select id, email, full_name, role, phone from users where email = 'test@example.com';
 
 delete from users where email = 'test@example.com';
+
+create or replace function is_client() returns bool as
+    $$
+    begin
+        return auth.role() = 'client';
+    end;
+    $$language plpgsql;
+
+create or replace function is_manager() returns bool as
+    $$
+    begin
+        return auth.role() = 'manager';
+    end;
+    $$language plpgsql;
+
+create or replace function is_manager_to_restaurant(resto_id int) returns bool as
+    $$
+    begin
+        return exists(
+            select 1
+            from restaurant_managers rm
+            where rm.manager = auth.id() and rm.restaurant = resto_id
+        );
+    end;
+    $$language plpgsql;
+
+grant execute on function is_client to authenticated;
+grant execute on function is_manager to authenticated;
+grant execute on function is_manager_to_restaurant to authenticated;
