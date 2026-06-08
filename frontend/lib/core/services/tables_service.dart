@@ -56,4 +56,37 @@ class TablesService {
       throw Exception('Failed to assign tables to reservation');
     }
   }
+
+  static Future<List<Tables>> getTablesPerRestaurant(int restoId) async {
+    final response = await ApiClient.post(
+      'get_tables_per_restaurant',
+      body : json.encode({'resto_id': restoId})
+    );
+
+    if(response.statusCode != 200){
+      throw Exception('Failed to get tables per restaurant');
+    }
+    final dynamic body = json.decode(response.body);
+    final List<dynamic> rows = body;
+    return rows.map((row) => Tables.fromJson(row)).toList();
+  }
+
+  static Future<int> saveTable(int restoId, int tableNumber, int tableCapacity, int? tableId) async {
+    final response = await ApiClient.post(
+      'save_table',
+      body : json.encode({
+        'resto_id' : restoId,
+        '_table_number' : tableNumber,
+        'table_capacity' : tableCapacity,
+        'table_id' : tableId
+      })
+    );
+
+    if(response.statusCode != 200){
+      throw Exception('Failed to save table');
+    }
+
+    final dynamic body = json.decode(response.body);
+    return body is int ? body : body.first.values.first as int;
+  }
 }
