@@ -21,15 +21,22 @@ $$ language plpgsql security definer;
 
 grant execute on function get_services(restaurant_id int) to authenticated;
 
-create or replace function set_service(service_id int, new_start TIME, new_end TIME)
-returns void as
+create or replace function set_service(service_id int, new_day_of_week int, new_start_time time, new_end_time time)
+    returns void as
 $$
-    begin
-        update services set start_time = new_start, end_time = new_end where id = service_id;
-    end;
+begin
+    perform auth.check_logged();
+    update services
+    set
+        day_of_week = new_day_of_week,
+        start_time = new_start_time,
+        end_time = new_end_time
+    where id = service_id;
+end;
 $$ language plpgsql security definer;
 
-grant execute on function set_service(service_id int, new_start TIME, new_end TIME) to manager;
+
+grant execute on function set_service(service_id int, new_day_of_week int, new_start_time time, new_end_time time) to manager;
 
 create or replace function add_service(restaurant_id int, week_day int, new_start_time TIME, new_end_time TIME)
 returns void as
@@ -40,3 +47,16 @@ $$
 $$ language plpgsql security definer;
 
 grant execute on function add_service(restaurant_id int, week_day int, new_start_time TIME, new_end_time TIME) to manager;
+
+create or replace function delete_service(service_id int)
+    returns void as
+$$
+begin
+    perform auth.check_logged();
+
+    delete from services
+    where id = service_id;
+end;
+$$ language plpgsql security definer;
+
+grant execute on function delete_service(service_id int) to manager;

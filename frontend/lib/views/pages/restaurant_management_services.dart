@@ -76,132 +76,189 @@ class RestaurantManagementServicesScreen extends ConsumerWidget {
                 .add(service);
           }
 
-        return Scaffold(
-          appBar: AppBar(
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () => Navigator.popUntil(
-                context,
-                ModalRoute.withName('/home_manager'),
-              ),
-            ),
-            title: Text(restaurant!.name),
-            automaticallyImplyLeading: false,
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.refresh),
-                tooltip: 'Rafraîchir les données',
-                onPressed: () {},
-              ),
-            ],
-            elevation: 2,
-            backgroundColor: theme.colorScheme.primary,
-            foregroundColor: theme.colorScheme.onPrimary,
-            surfaceTintColor: Colors.transparent,
-            flexibleSpace: Align(
-              alignment: Alignment.topCenter,
-              child: SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 2.0),
-                  child: TimeTravelWidget(),
-                ),
-              ),
-            ),
-          ),
-          body: SafeArea(
-            child: Stack(
-              children: [
-                ListView(
-                  padding: const EdgeInsets.all(16.0),
-                  children: [
-                    ServiceCard(
-                      dayName: 'Lundi',
-                      services: servicesByDay[1] ?? const [],
-                      onEdit: (service) {},
-                      onDelete: (service) {},
-                      canDelete: (service) => deletableServiceIds.contains(service.id)
+          void openEditService(Services service) {
+            notifier.selectService(service);
+
+            Navigator.pushNamed(
+              context,
+              '/edit_service',
+            );
+          }
+
+          Future<void> deleteService(Services service) async {
+            final confirmed = await showDialog<bool>(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: const Text('Supprimer le service'),
+                  content: Text(
+                    'Etes-vous sûr de vouloir supprimer le service '
+                        '${service.startTime.substring(0, 5)} - '
+                        '${service.endTime.substring(0, 5)} ?',
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: const Text('Annuler'),
                     ),
-                    ServiceCard(
-                      dayName: 'Mardi',
-                      services: servicesByDay[2] ?? const [],
-                      onEdit: (service) {},
-                      onDelete: (service) {},
-                      canDelete: (service) => deletableServiceIds.contains(service.id)
-                    ),
-                    ServiceCard(
-                      dayName: 'Mercredi',
-                      services: servicesByDay[3] ?? const [],
-                      onEdit: (service) {},
-                      onDelete: (service) {},
-                      canDelete: (service) => deletableServiceIds.contains(service.id)
-                    ),
-                    ServiceCard(
-                      dayName: 'Jeudi',
-                      services: servicesByDay[4] ?? const [],
-                      onEdit: (service) {},
-                      onDelete: (service) {},
-                      canDelete: (service) => deletableServiceIds.contains(service.id)
-                    ),
-                    ServiceCard(
-                      dayName: 'Vendredi',
-                      services: servicesByDay[5] ?? const [],
-                      onEdit: (service) {},
-                      onDelete: (service) {},
-                        canDelete: (service) => deletableServiceIds.contains(service.id)
-                    ),
-                    ServiceCard(
-                      dayName: 'Samedi',
-                      services: servicesByDay[6] ?? const [],
-                      onEdit: (service) {},
-                      onDelete: (service) {},
-                      canDelete: (service) => deletableServiceIds.contains(service.id)
-                    ),
-                    ServiceCard(
-                      dayName: 'Dimanche',
-                      services: servicesByDay[7] ?? const [],
-                      onEdit: (service) {},
-                      onDelete: (service) {},
-                      canDelete: (service) => deletableServiceIds.contains(service.id)
+                    FilledButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      child: const Text('Supprimer'),
                     ),
                   ],
+                );
+              },
+            );
+
+            if (confirmed != true) return;
+
+            try {
+              await notifier.deleteService(service);
+
+              if (!context.mounted) return;
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Service supprimé.'),
                 ),
-                Positioned(
-                  bottom: 16,
-                  right: 16,
-                  child: FloatingActionButton(
-                    heroTag: 'services_fab',
-                    onPressed: () {},
-                    child: const Icon(Icons.add),
+              );
+            } catch (e) {
+              if (!context.mounted) return;
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(e.toString()),
+                ),
+              );
+            }
+          }
+
+          return Scaffold(
+            appBar: AppBar(
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => Navigator.popUntil(
+                  context,
+                  ModalRoute.withName('/home_manager'),
+                ),
+              ),
+              title: Text(restaurant!.name),
+              automaticallyImplyLeading: false,
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.refresh),
+                  tooltip: 'Rafraîchir les données',
+                  onPressed: () {},
+                ),
+              ],
+              elevation: 2,
+              backgroundColor: theme.colorScheme.primary,
+              foregroundColor: theme.colorScheme.onPrimary,
+              surfaceTintColor: Colors.transparent,
+              flexibleSpace: Align(
+                alignment: Alignment.topCenter,
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 2.0),
+                    child: TimeTravelWidget(),
                   ),
+                ),
+              ),
+            ),
+            body: SafeArea(
+              child: Stack(
+                children: [
+                  ListView(
+                    padding: const EdgeInsets.all(16.0),
+                    children: [
+                      ServiceCard(
+                        dayName: 'Lundi',
+                        services: servicesByDay[1] ?? const [],
+                        onEdit: openEditService,
+                          onDelete: deleteService,
+                        canDelete: (service) => deletableServiceIds.contains(service.id)
+                      ),
+                      ServiceCard(
+                        dayName: 'Mardi',
+                        services: servicesByDay[2] ?? const [],
+                        onEdit: openEditService,
+                          onDelete: deleteService,
+                        canDelete: (service) => deletableServiceIds.contains(service.id)
+                      ),
+                      ServiceCard(
+                        dayName: 'Mercredi',
+                        services: servicesByDay[3] ?? const [],
+                          onEdit: openEditService,
+                          onDelete: deleteService,
+                        canDelete: (service) => deletableServiceIds.contains(service.id)
+                      ),
+                      ServiceCard(
+                        dayName: 'Jeudi',
+                        services: servicesByDay[4] ?? const [],
+                          onEdit: openEditService,
+                          onDelete: deleteService,
+                        canDelete: (service) => deletableServiceIds.contains(service.id)
+                      ),
+                      ServiceCard(
+                        dayName: 'Vendredi',
+                        services: servicesByDay[5] ?? const [],
+                          onEdit: openEditService,
+                          onDelete: deleteService,
+                          canDelete: (service) => deletableServiceIds.contains(service.id)
+                      ),
+                      ServiceCard(
+                        dayName: 'Samedi',
+                        services: servicesByDay[6] ?? const [],
+                          onEdit: openEditService,
+                          onDelete: deleteService,
+                        canDelete: (service) => deletableServiceIds.contains(service.id)
+                      ),
+                      ServiceCard(
+                        dayName: 'Dimanche',
+                        services: servicesByDay[7] ?? const [],
+                          onEdit: openEditService,
+                        onDelete: deleteService,
+                        canDelete: (service) => deletableServiceIds.contains(service.id)
+                      ),
+                    ],
+                  ),
+                  Positioned(
+                    bottom: 16,
+                    right: 16,
+                    child: FloatingActionButton(
+                      heroTag: 'services_fab',
+                      onPressed: () {},
+                      child: const Icon(Icons.add),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            bottomNavigationBar: BottomNavigationBar(
+              type: BottomNavigationBarType.fixed,
+              currentIndex: 1,
+              onTap: (index) {
+                const addr = ['/restaurant_management_reservations', '/manage_services', '/manage_tables'];
+                if (index !=  1) {
+                  Navigator.pushNamed(context, addr[index]);
+                }
+              },
+              items: const [
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.book),
+                  label: 'Réservations',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.schedule),
+                  label: 'Services',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.table_restaurant),
+                  label: 'Tables',
                 ),
               ],
             ),
-          ),
-          bottomNavigationBar: BottomNavigationBar(
-            type: BottomNavigationBarType.fixed,
-            currentIndex: 1,
-            onTap: (index) {
-              const addr = ['/restaurant_management_reservations', '/manage_services', '/manage_tables'];
-              if (index !=  1) {
-                Navigator.pushNamed(context, addr[index]);
-              }
-            },
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.book),
-                label: 'Réservations',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.schedule),
-                label: 'Services',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.table_restaurant),
-                label: 'Tables',
-              ),
-            ],
-          ),
-        );
+          );
       },
     );
   }

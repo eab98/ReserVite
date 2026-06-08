@@ -29,10 +29,10 @@ class ServiceServices {
     final response = await ApiClient.post(
       'set_service',
       body: json.encode({
-        '_service_id': serviceId,
-        '_day_of_week': dayOfWeek,
-        '_start_time': startTime,
-        '_end_time': endTime,
+        'service_id': serviceId,
+        'new_day_of_week': dayOfWeek,
+        'new_start_time': startTime,
+        'new_end_time': endTime,
       }),
       anonymous: false,
     );
@@ -40,6 +40,22 @@ class ServiceServices {
     if (response.statusCode != 200 && response.statusCode != 204) {
       throw Exception(
         'Failed to update service: ${response.statusCode} ${response.body}',
+      );
+    }
+  }
+
+  static Future<void> deleteService(int serviceId) async {
+    final response = await ApiClient.post(
+      'delete_service',
+      body: json.encode({
+        'service_id': serviceId,
+      }),
+      anonymous: false,
+    );
+
+    if (response.statusCode != 200 && response.statusCode != 204) {
+      throw Exception(
+        'Failed to delete service: ${response.statusCode} ${response.body}',
       );
     }
   }

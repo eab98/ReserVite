@@ -4,6 +4,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:prbd_2526_a03/core/tools/params.dart';
 import 'package:prbd_2526_a03/views/pages/add_reservation.dart';
 import 'package:prbd_2526_a03/views/pages/assign_tables.dart';
+import 'package:prbd_2526_a03/views/pages/edit_service.dart';
 import 'package:prbd_2526_a03/views/pages/find_restaurants.dart';
 import 'package:prbd_2526_a03/views/pages/login.dart';
 import 'package:prbd_2526_a03/views/pages/my_reservations.dart';
@@ -37,7 +38,8 @@ void main() async {
         '/restaurant_management_reservations' : (context) => const RestaurantManagementReservationsScreen(),
         '/reservation_details_manager' : (context) => const ReservationDetailsManagerScreen(),
         '/assign_tables' : (context) => const AssignTablesScreen(),
-        '/manage_services' : (context) => const RestaurantManagementServicesScreen()
+        '/manage_services' : (context) => const RestaurantManagementServicesScreen(),
+        '/edit_service': (context) => const EditServiceScreen(),
       }
     ),
   )

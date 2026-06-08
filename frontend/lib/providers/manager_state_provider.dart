@@ -354,4 +354,28 @@ class ManagerStateNotifier extends AsyncNotifier<ManagerState> {
       rethrow;
     }
   }
+
+  Future<void> deleteService(Services service) async {
+    final previous = state.value;
+    if (previous == null) return;
+
+    final restaurant = previous.currentRestaurant;
+    if (restaurant == null) return;
+
+    try {
+      await ServiceServices.deleteService(service.id);
+
+      final services =
+      await ServiceServices.getServices(restaurant.id);
+
+      state = AsyncData(
+        previous.copyWith(
+          currentRestaurantServices: services,
+        ),
+      );
+    } catch (e, st) {
+      state = AsyncError(e, st);
+      rethrow;
+    }
+  }
 }
