@@ -286,7 +286,7 @@ create or replace function save_reservation(
     $$language plpgsql security definer ;
 grant execute on function save_reservation to authenticated;
 
-/*select auth.login_for_test('brlacroix@epfc.eu');
+/*select auth.login_for_test('carol@example.com');
 select save_reservation(3, '2024-12-04 19:00:00', 2, 'pending');
 select auth.logout_for_test();*/
 
@@ -321,12 +321,12 @@ grant execute on function cancel_reservation(int) to authenticated;
 grant execute on function cancel_reservation to manager;
 
 
--- select auth.login_for_test('brlacroix@epfc.eu');
+-- select auth.login_for_test('carol@example.com');
 -- select cancel_reservation(13);
 -- select status from reservations where id = 13;
 -- select auth.logout_for_test();
 
--- select auth.login_for_test('brlacroix@epfc.eu');
+-- select auth.login_for_test('carol@example.com');
 -- select cancel_reservation(13);
 -- select status from reservations where id = 13;
 -- select auth.logout_for_test();

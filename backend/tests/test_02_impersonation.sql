@@ -31,11 +31,11 @@ do
 $test$
     begin
         raise notice 'TEST: login_for_test en tant que client';
-        perform auth.login_for_test('brlacroix@epfc.eu');
+        perform auth.login_for_test('carol@example.com');
         assert current_user = 'client';
         assert auth.role() = 'client';
         assert auth.id() = 6;
-        assert auth.email() = 'brlacroix@epfc.eu';
+        assert auth.email() = 'carol@example.com';
         perform auth.logout_for_test();
     end
 $test$;
@@ -48,11 +48,11 @@ do
 $test$
     begin
         raise notice 'TEST: login_for_test en tant que manager';
-        perform auth.login_for_test('bepenelle@epfc.eu');
+        perform auth.login_for_test('alice@example.com');
         assert current_user = 'manager';
         assert auth.role() = 'manager';
         assert auth.id() = 2;
-        assert auth.email() = 'bepenelle@epfc.eu';
+        assert auth.email() = 'alice@example.com';
         perform auth.logout_for_test();
     end
 $test$;

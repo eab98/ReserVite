@@ -43,7 +43,7 @@ class _MyRestaurantsScreen extends ConsumerState<MyRestaurantsScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.logout),
-            tooltip: 'Déconnexion (Benoît P.)',
+            tooltip: 'Déconnexion',
             onPressed: () => _logout(context),
           ),
         ],

@@ -44,7 +44,6 @@ class RestaurantManagementServicesScreen extends ConsumerWidget {
           ),
         ),
         data: (managerState) {
-          notifier.refreshServices();
           final restaurant = managerState.currentRestaurant;
           final services = managerState.currentRestaurantServices;
           final reservations = managerState.reservations;

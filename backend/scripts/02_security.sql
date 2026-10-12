@@ -44,14 +44,14 @@ begin
     truncate table users cascade;
 
     insert into users (id, email, password, full_name, role)
-    values (1, 'boverhaegen@epfc.eu', 'Password2,', 'Boris', 'manager'),
-           (2, 'bepenelle@epfc.eu', 'Password2,', 'Benoît', 'manager'),
-           (3, 'xapigeolet@epfc.eu', 'Password2,', 'Xavier', 'client'),
-           (4, 'mamichel@epfc.eu', 'Password2,', 'Marc', 'client'),
-           (5, 'gedielman@epfc.eu', 'Password2,', 'Geoffrey', 'manager'),
-           (6, 'brlacroix@epfc.eu', 'Password2,', 'Bruno', 'client'),
-           (7, 'client@epfc.eu', 'Password2,', 'Client', 'client'),
-           (8, 'manager@epfc.eu', 'Password2,', 'Manager', 'manager');
+    values (1, 'bob@example.com', 'Password2,', 'Bob', 'manager'),
+           (2, 'alice@example.com', 'Password2,', 'Alice', 'manager'),
+           (3, 'frank@example.com', 'Password2,', 'Frank', 'client'),
+           (4, 'emma@example.com', 'Password2,', 'Emma', 'client'),
+           (5, 'david@example.com', 'Password2,', 'David', 'manager'),
+           (6, 'carol@example.com', 'Password2,', 'Carol', 'client'),
+           (7, 'client@example.com', 'Password2,', 'Client', 'client'),
+           (8, 'manager@example.com', 'Password2,', 'Manager', 'manager');
 
     alter table users enable trigger all;
 

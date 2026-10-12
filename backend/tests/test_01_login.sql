@@ -11,7 +11,7 @@ do
 $test$
     begin
         raise notice 'TEST: login correct';
-        perform login('bepenelle@epfc.eu', 'Password1,');
+        perform login('alice@example.com', 'Password1,');
     end
 $test$;
 rollback;
@@ -40,7 +40,7 @@ $test$
     begin
         raise notice 'TEST: login avec un mauvais mot de passe';
         perform should_fail($$
-            select login('bepenelle@epfc.eu', 'xxx');
+            select login('alice@example.com', 'xxx');
         $$);
     end
 $test$;

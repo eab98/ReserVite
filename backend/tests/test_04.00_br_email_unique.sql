@@ -10,7 +10,7 @@ $test$
     begin
         raise notice 'TEST: email du user est unique';
         perform should_fail($$
-            update users set email = 'bepenelle@epfc.eu' where id = 1;
+            update users set email = 'alice@example.com' where id = 1;
         $$, 'unique_violation');
     end
 $test$;

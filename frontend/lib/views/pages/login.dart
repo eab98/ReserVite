@@ -171,9 +171,9 @@ class LoginScreen extends ConsumerStatefulWidget {
                       children: [
                         Expanded(
                           child: OutlinedButton.icon(
-                            onPressed: () => _login(context, 'brlacroix@epfc.eu', 'Password1,'),
+                            onPressed: () => _login(context, 'carol@example.com', 'Password1,'),
                             icon: const Icon(Icons.person),
-                            label: const Text('Client (Bruno)'),
+                            label: const Text('Client (Carol)'),
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 8),
                             ),
@@ -182,9 +182,9 @@ class LoginScreen extends ConsumerStatefulWidget {
                         const SizedBox(width: 8),
                         Expanded(
                           child: OutlinedButton.icon(
-                            onPressed: () => _login(context, 'mamichel@epfc.eu', 'Password1,'),
+                            onPressed: () => _login(context, 'emma@example.com', 'Password1,'),
                             icon: const Icon(Icons.person),
-                            label: const Text('Client (Marc)'),
+                            label: const Text('Client (Emma)'),
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 8),
                             ),
@@ -197,9 +197,9 @@ class LoginScreen extends ConsumerStatefulWidget {
                       children: [
                         Expanded(
                           child: OutlinedButton.icon(
-                            onPressed: () => _login(context, 'bepenelle@epfc.eu', 'Password1,'),
+                            onPressed: () => _login(context, 'alice@example.com', 'Password1,'),
                             icon: const Icon(Icons.manage_accounts),
-                            label: const Text('Manager (Benoît)'),
+                            label: const Text('Manager (Alice)'),
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 8),
                             ),
@@ -208,9 +208,9 @@ class LoginScreen extends ConsumerStatefulWidget {
                         const SizedBox(width: 8),
                         Expanded(
                           child: OutlinedButton.icon(
-                            onPressed: () => _login(context, 'gedielman@epfc.eu', 'Password1,'),
+                            onPressed: () => _login(context, 'david@example.com', 'Password1,'),
                             icon: const Icon(Icons.manage_accounts),
-                            label: const Text('Manager (Geoffrey)'),
+                            label: const Text('Manager (David)'),
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 8),
                             ),

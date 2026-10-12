@@ -164,6 +164,7 @@ class _RestaurantManagementReservationsScreenState
             currentIndex: 0,
             onTap: (index) {
               const addr = ['/restaurant_management_reservations', '/manage_services', '/manage_tables'];
+              notifier.refreshServices();
               if (index !=  0) {
                 Navigator.pushNamed(context, addr[index]);
               }

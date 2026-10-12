@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import '../../models/reservation.dart';
 import '../../models/services.dart';
 import '../../providers/manager_state_provider.dart';
@@ -15,7 +14,6 @@ class EditServiceScreen extends ConsumerStatefulWidget {
 
 class _EditServiceScreenState extends ConsumerState<EditServiceScreen> {
   int? _loadedServiceId;
-
   int? dayOfWeek;
   int? startHour;
   int? startMinute;
@@ -41,6 +39,7 @@ class _EditServiceScreenState extends ConsumerState<EditServiceScreen> {
       ),
       data: (managerState) {
         final service = managerState.currentService;
+        final restaurant = managerState.currentRestaurant;
 
         if (service == null) {
           return const Scaffold(
@@ -178,23 +177,12 @@ class _EditServiceScreenState extends ConsumerState<EditServiceScreen> {
                               labelText: 'Minutes',
                               border: OutlineInputBorder(),
                             ),
-                            items: const [
-                              DropdownMenuItem<int?>(
-                                value: 0,
-                                child: Text('00 min'),
-                              ),
-                              DropdownMenuItem<int?>(
-                                value: 15,
-                                child: Text('15 min'),
-                              ),
-                              DropdownMenuItem<int?>(
-                                value: 30,
-                                child: Text('30 min'),
-                              ),
-                              DropdownMenuItem<int?>(
-                                value: 45,
-                                child: Text('45 min'),
-                              ),
+                            items: [
+                              for (int m = 0; m < 60; m += restaurant!.slotDuration)
+                                DropdownMenuItem<int?>(
+                                  value: m,
+                                  child: Text('${m.toString().padLeft(2, '0')} min'),
+                                ),
                             ],
                             onChanged: (value) {
                               setState(() {
@@ -240,23 +228,13 @@ class _EditServiceScreenState extends ConsumerState<EditServiceScreen> {
                               labelText: 'Minutes',
                               border: OutlineInputBorder(),
                             ),
-                            items: const [
-                              DropdownMenuItem<int?>(
-                                value: 0,
-                                child: Text('00 min'),
-                              ),
-                              DropdownMenuItem<int?>(
-                                value: 15,
-                                child: Text('15 min'),
-                              ),
-                              DropdownMenuItem<int?>(
-                                value: 30,
-                                child: Text('30 min'),
-                              ),
-                              DropdownMenuItem<int?>(
-                                value: 45,
-                                child: Text('45 min'),
-                              ),
+                            items: [
+
+                              for (int m = 0; m < 60; m += restaurant!.slotDuration)
+                                DropdownMenuItem<int?>(
+                                  value: m,
+                                  child: Text('${m.toString().padLeft(2, '0')} min'),
+                                ),
                             ],
                             onChanged: (value) {
                               setState(() {
