@@ -21,16 +21,9 @@ In the database:
 - 6 of the 14 numbered business rules (BR-01, 02, 03, 07, 12, 13), with triggers
 
 In the app, each feature from end to end (SQL function, API call, model, Riverpod provider and view):
-- sign up, login, reset of the database
-- the simulated time, to test the rules that depend on the date
-- for customers: list, view, add, edit and cancel a reservation
-- for managers: cancel and complete a reservation, manage tables, sort the restaurants by latest reservation
 
-
-- 
-- 
-- for customers: find and view a restaurant (through a search bar)
-- for managers: confirm and assign tables, see the details of a reservation, manage services
+- for customers: list reservations, find and view a restaurant (through a search bar)
+- for managers: confirm and assign tables, list restaurants, list and see the details of a reservation, manage services
 
 After a change, the providers update the data locally instead of reloading everything from the server, so every screen showing that data refreshes on its own.
 
